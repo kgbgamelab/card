@@ -108,8 +108,7 @@
   <div id="bottom-ui">
     <div id="xp-info">
       <span><span id="xp-label">XP</span>: <span id="lvl-num">0</span></span>
-      <span style="color: #ffd700"><span id="combo-label">COMBO</span>: x<span id="combo-num">0</span></span>
-      <span style="color:#55ff55"><span id="chests-label">CHESTS</span>: <span id="chests-num">0</span>/<span id="chests-total">0</span></span>
+<span style="color:#55ff55"><span id="chests-label">CHESTS</span>: <span id="chests-num">0</span>/<span id="chests-total">0</span></span>
       <span style="color:#55aaff"><span id="cards-label">CARDS</span>: <span id="cards-num">0</span>/<span id="cards-total">0</span></span>
     </div>
     <div class="hearts" id="hearts-container">
@@ -153,7 +152,7 @@
 
 <script>
 let scene, camera, renderer, weaponGroup, flash;
-let score = 0, health = 5, combo = 0;
+let score = 0, health = 5;
 let targets = [], particles = [], bonuses = [], items = [], projectiles = [], houses = [], balloons = [], cards = [];
 let move = { fwd: false, bwd: false, left: false, right: false, sprint: false, jump: false };
 let player = { vel: new THREE.Vector3(), onGround: false, height: 1.7, speed: 0 };
@@ -178,8 +177,7 @@ const I18N = {
     ok: "ОК!",
     shelter: "🛡️ В УКРЫТИИ",
     xp: "XP",
-    combo: "КОМБО",
-    chests: "СУНДУКИ",
+chests: "СУНДУКИ",
     cards: "ОТКРЫТКИ",
     victory: "ПОБЕДА!",
     score: "ОЧКИ",
@@ -197,8 +195,7 @@ const I18N = {
     ok: "OK!",
     shelter: "🛡️ IN SHELTER",
     xp: "XP",
-    combo: "COMBO",
-    chests: "CHESTS",
+chests: "CHESTS",
     cards: "CARDS",
     victory: "VICTORY!",
     score: "SCORE",
@@ -216,8 +213,7 @@ const I18N = {
     ok: "好的！",
     shelter: "🛡️ 在避难所",
     xp: "经验",
-    combo: "连击",
-    chests: "宝箱",
+chests: "宝箱",
     cards: "明信片",
     victory: "胜利！",
     score: "分数",
@@ -235,8 +231,7 @@ const I18N = {
     ok: "OK !",
     shelter: "🛡️ À L’ABRI",
     xp: "XP",
-    combo: "COMBO",
-    chests: "COFFRES",
+chests: "COFFRES",
     cards: "CARTES",
     victory: "VICTOIRE !",
     score: "SCORE",
@@ -254,8 +249,7 @@ const I18N = {
     ok: "OK!",
     shelter: "🛡️ IM SCHUTZ",
     xp: "XP",
-    combo: "KOMBO",
-    chests: "TRUHEN",
+chests: "TRUHEN",
     cards: "KARTEN",
     victory: "SIEG!",
     score: "PUNKTE",
@@ -273,8 +267,7 @@ const I18N = {
     ok: "¡OK!",
     shelter: "🛡️ EN REFUGIO",
     xp: "XP",
-    combo: "COMBO",
-    chests: "COFRES",
+chests: "COFRES",
     cards: "POSTALES",
     victory: "¡VICTORIA!",
     score: "PUNTOS",
@@ -292,8 +285,7 @@ const I18N = {
     ok: "OK！",
     shelter: "🛡️ シェルター内",
     xp: "XP",
-    combo: "コンボ",
-    chests: "チェスト",
+chests: "チェスト",
     cards: "カード",
     victory: "クリア！",
     score: "スコア",
@@ -311,8 +303,7 @@ const I18N = {
     ok: "OK!",
     shelter: "🛡️ AL RIPARO",
     xp: "XP",
-    combo: "COMBO",
-    chests: "BAULI",
+chests: "BAULI",
     cards: "CARTOLINE",
     victory: "VITTORIA!",
     score: "PUNTEGGIO",
@@ -337,10 +328,7 @@ function applyLanguageToUI() {
   const house = document.getElementById("house-status");
   if (house) house.innerText = t("shelter");
   const xpL = document.getElementById("xp-label");
-  if (xpL) xpL.innerText = t("xp");
-  const comboL = document.getElementById("combo-label");
-  if (comboL) comboL.innerText = t("combo");
-  const chL = document.getElementById("chests-label");
+  if (xpL) xpL.innerText = t("xp");const chL = document.getElementById("chests-label");
   if (chL) chL.innerText = t("chests");
   const caL = document.getElementById("cards-label");
   if (caL) caL.innerText = t("cards");
@@ -396,7 +384,7 @@ function updateProgressUI() {
   const kt = document.getElementById("cards-total");
   if (cn) cn.innerText = openedChests;
   if (ct) ct.innerText = totalChests;
-  if (kn) kn.innerText = foundCards;
+  if (kn) kn.innerText = readCards;
   if (kt) kt.innerText = totalCards;
 }
 
@@ -1253,9 +1241,7 @@ function attack() {
 }
 
 function updateUI() {
-  document.getElementById('lvl-num').innerText = score;
-  document.getElementById('combo-num').innerText = combo;
-  document.getElementById('xp-fill').style.width = Math.min(100, (score % 1000) / 10) + '%';
+  document.getElementById('lvl-num').innerText = score;document.getElementById('xp-fill').style.width = Math.min(100, (score % 1000) / 10) + '%';
 }
 
 function checkHouseProtection(pos) {
