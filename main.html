@@ -460,6 +460,24 @@ function getLevelIdFromUrl() {
 }
 
 
+
+function normalizeLang(v) {
+  const s = String(v || "").trim().toLowerCase();
+  // allow passing full language names too
+  const map = {
+    "ru":"ru","русский":"ru","russian":"ru",
+    "en":"en","english":"en","английский":"en",
+    "zh":"zh","中文":"zh","chinese":"zh","китайский":"zh",
+    "fr":"fr","français":"fr","french":"fr","французский":"fr",
+    "de":"de","deutsch":"de","german":"de","немецкий":"de",
+    "es":"es","español":"es","spanish":"es","испанский":"es",
+    "ja":"ja","日本語":"ja","japanese":"ja","японский":"ja",
+    "it":"it","italiano":"it","italian":"it","итальянский":"it"
+  };
+  const code = map[s] || s.slice(0,2);
+  return I18N[code] ? code : "ru";
+}
+
 function extractImageUrl(text) {
   const s = String(text || "");
   // markdown image ![](url)
@@ -544,7 +562,13 @@ async function loadLevelData() {
     const j = await res.json();
     const data = j.data || j; // ✅ как в твоём примере
 
-    LANG = (data.lang || 'ru');
+    
+    // язык интерфейса (из редактора)
+    if (data.lang || data.language) {
+      LANG = normalizeLang(data.lang || data.language);
+      applyLanguageToUI();
+    }
+LANG = (data.lang || 'ru');
     SKY_TEXT_MSG = sanitizeSkyText(data.skyText);
     applyLanguageToUI();
 
