@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Minecraft: Happy Birthday Max!</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; overflow: hidden; background: #87CEEB; font-family: 'VT323', monospace; user-select: none; }
+    #hud { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+
+    #bday-card {
+      display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95); border: 8px solid #ff55ff; padding: 40px;
+      text-align: center; border-radius: 20px; box-shadow: 0 0 50px #fff; pointer-events: auto; z-index: 1000;
+    }
+    #card-text { font-size: 50px; color: #ff00aa; text-shadow: 2px 2px 0 #000; }
+    .close-btn { margin-top: 20px; padding: 10px 20px; font-family: 'VT323'; font-size: 24px; cursor: pointer; background: #ff55ff; color: white; border: none; }
+
+    .float-text {
+      position: absolute; color: #ffff55; font-size: 40px; font-weight: bold;
+      text-shadow: 3px 3px 0 #000; pointer-events: none;
+      animation: floatUp 1s forwards;
+    }
+    .crit { color: #ff3333; font-size: 60px; text-shadow: 4px 4px 0 #000; }
+    @keyframes floatUp { to { transform: translateY(-120px) scale(1.2); opacity: 0; } }
+
+    #house-status {
+      position: absolute; top: 100px; width: 100%; text-align: center;
+      font-size: 30px; color: #55ff55; text-shadow: 2px 2px 0 #000; display: none;
+    }
+
+    #crosshair {
+      position: absolute; top: 50%; left: 50%; width: 24px; height: 24px;
+      transform: translate(-50%, -50%); mix-blend-mode: difference;
+    }
+    #crosshair::before { content: ''; position: absolute; top: 11px; left: 0; width: 24px; height: 2px; background: white; }
+    #crosshair::after { content: ''; position: absolute; top: 0; left: 11px; width: 2px; height: 24px; background: white; }
+
+    #bottom-ui {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      width: 600px; text-align: center;
+    }
+
+    .hearts { display: flex; gap: 4px; justify-content: center; margin-bottom: 5px; }
+    .heart {
+      width: 32px; height: 32px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path fill="%23ff0000" stroke="black" stroke-width="0.5" d="M2 1h2v1h2V1h2v2H7v1H6v1H5v1H4V5H3V4H2V2h2z"/></svg>');
+      background-size: contain; image-rendering: pixelated;
+    }
+    .heart.lost { filter: grayscale(100%) brightness(0.3); }
+
+    #xp-bar { width: 100%; height: 16px; background: #222; border: 3px solid #000; position: relative; margin-bottom: 10px; }
+    #xp-fill { height: 100%; background: linear-gradient(to right, #00ff00, #55ff55); width: 0%; transition: width 0.2s; }
+    #xp-info { position: absolute; top: -35px; width: 100%; color: #80ff00; font-size: 30px; text-shadow: 2px 2px 0 #000; display: flex; justify-content: space-around; }
+
+    #hotbar { display: flex; justify-content: center; gap: 4px; background: rgba(0,0,0,0.6); padding: 5px; border: 2px solid #fff; border-radius: 4px; }
+    .slot {
+      width: 60px; height: 60px; background: #8b8b8b; border: 4px solid #373737; border-top-color: #ddd; border-left-color: #ddd;
+      display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;
+    }
+    .slot.active { border-color: white; background: #a0a0a0; transform: scale(1.1); }
+
+    #damage-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
+    #fire-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 40%; background: linear-gradient(transparent, rgba(255, 100, 0, 0.5)); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+
+    #game-over { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 999; background: rgba(50,0,0,0.9); }
+    .btn-respawn { font-size: 40px; cursor: pointer; color: #ffff55; text-decoration: underline; margin-top: 20px; }
+  
+    #bday-card .card-media {
+      margin-top: 18px;
+      width: 520px;
+      max-width: 80vw;
+      height: 320px;
+      border-radius: 14px;
+      border: 6px solid #55ffff;
+      box-shadow: 0 0 40px rgba(255,255,255,0.65);
+      overflow: hidden;
+      position: relative;
+      background: rgba(0,0,0,0.08);
+      transform-style: preserve-3d;
+    }
+    #bday-card .card-media img {
+      width: 110%;
+      height: 110%;
+      object-fit: cover;
+      position: absolute;
+      left: -5%;
+      top: -5%;
+      transform: translate3d(0,0,0) scale(1.02);
+      will-change: transform;
+      image-rendering: auto;
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="damage-overlay"></div>
+<div id="fire-overlay"></div>
+
+<div id="hud">
+  <div id="bday-card">
+    <div id="card-text">Happy Birthday!</div>
+    <button class="close-btn" id="close-card-btn">OK</button>
+  </div>
+  <div id="house-status">🛡️ В УКРЫТИИ</div>
+  <div id="crosshair"></div>
+  <div id="bottom-ui">
+    <div id="xp-info">
+      <span><span id="xp-label">XP</span>: <span id="lvl-num">0</span></span>
+      <span style="color: #ffd700"><span id="combo-label">COMBO</span>: x<span id="combo-num">0</span></span>
+      <span style="color:#55ff55"><span id="chests-label">CHESTS</span>: <span id="chests-num">0</span>/<span id="chests-total">0</span></span>
+      <span style="color:#55aaff"><span id="cards-label">CARDS</span>: <span id="cards-num">0</span>/<span id="cards-total">0</span></span>
+    </div>
+    <div class="hearts" id="hearts-container">
+      <div class="heart"></div><div class="heart"></div><div class="heart"></div><div class="heart"></div><div class="heart"></div>
+    </div>
+    <div id="xp-bar"><div id="xp-fill"></div></div>
+    <div id="hotbar">
+      <div class="slot active" id="slot-0">🔫</div>
+      <div class="slot" id="slot-1"></div>
+      <div class="slot" id="slot-2"></div>
+    </div>
+  </div>
+</div>
+
+<div id="game-over">
+  <h1 id="you-died-title" style="font-size: 100px; margin:0; text-shadow: 5px 5px 0 #000; color: #ff5555;">YOU DIED</h1>
+  <p id="respawn-btn" class="btn-respawn" onclick="location.reload()">Respawn</p>
+</div>
+
+
+<div id="victory" style="display:none; position:absolute; inset:0; z-index:1001; background:rgba(0,0,0,0.75); color:#fff; font-family:'VT323', monospace; text-align:center; padding-top:7vh;">
+  <div style="font-size:90px; text-shadow:5px 5px 0 #000; color:#55ff55;">VICTORY!</div>
+  <div style="font-size:40px; margin-top:10px;">
+    <span id="victory-score-label">SCORE</span>: <span id="victory-score">0</span>
+    &nbsp;|&nbsp;
+    <span id="victory-chests-label">CHESTS</span>: <span id="victory-chests">0</span>/<span id="victory-chests-total">0</span>
+    &nbsp;|&nbsp;
+    <span id="victory-cards-label">CARDS</span>: <span id="victory-cards">0</span>/<span id="victory-cards-total">0</span>
+  </div>
+  <div id="victory-achievements" style="max-width:900px; margin:25px auto 0; font-size:34px; line-height:1.25; color:#ffffff; text-shadow:2px 2px 0 #000;"></div>
+  <div style="margin-top:25px; font-size:34px; color:#ffff55;">(Esc) / Click → <span id="victory-restart-label">Restart</span></div>
+</div>
+
+<div id="ach-toast" style="position:absolute; right:20px; top:20px; z-index:1200; width:360px; pointer-events:none; display:none;">
+  <div style="background:rgba(20,30,60,0.78); border:4px solid #66D9FF; border-radius:10px; padding:14px 14px; box-shadow:0 0 30px rgba(255,255,255,0.35);">
+    <div id="ach-toast-top" style="font-size:26px; color:#ffff55; letter-spacing:1px; text-shadow:2px 2px 0 #000;">Achievement unlocked!</div>
+    <div id="ach-toast-name" style="font-size:40px; margin-top:4px; color:#ffffff; text-shadow:3px 3px 0 #000;">Name</div>
+  </div>
+</div>
+
+
+<script>
+let scene, camera, renderer, weaponGroup, flash;
+let score = 0, health = 5, combo = 0;
+let targets = [], particles = [], bonuses = [], items = [], projectiles = [], houses = [], balloons = [], cards = [];
+let move = { fwd: false, bwd: false, left: false, right: false, sprint: false, jump: false };
+let player = { vel: new THREE.Vector3(), onGround: false, height: 1.7, speed: 0 };
+let pitch = 0, yaw = 0;
+let isDead = false;
+let isModalOpen = false;
+let activeCardParallax = null;
+let pendingVictory = false;
+let victoryJustOpenedAt = 0;
+let lastDamageTime = 0, stepTimer = 0;
+let swingProgress = 0, isSwinging = false;
+let currentWeaponType = 'gun';
+let inventory = ['gun'];
+
+
+// ===================== i18n =====================
+let LANG = "ru";
+const I18N = {
+  ru: {
+    you_died: "ВЫ ПОГИБЛИ",
+    respawn: "Возродиться",
+    ok: "ОК!",
+    shelter: "🛡️ В УКРЫТИИ",
+    xp: "XP",
+    combo: "КОМБО",
+    chests: "СУНДУКИ",
+    cards: "ОТКРЫТКИ",
+    victory: "ПОБЕДА!",
+    score: "ОЧКИ",
+    restart: "Заново",
+    ach_unlocked: "Достижение получено!",
+    ach_group_hug: "Обнимашки ×10",
+    ach_all_weapons: "Все оружия",
+    ach_pacifist: "Пацифист",
+    ach_all_chests: "Все сундуки",
+    ach_all_cards: "Все открытки",
+  },
+  en: {
+    you_died: "YOU DIED",
+    respawn: "Respawn",
+    ok: "OK!",
+    shelter: "🛡️ IN SHELTER",
+    xp: "XP",
+    combo: "COMBO",
+    chests: "CHESTS",
+    cards: "CARDS",
+    victory: "VICTORY!",
+    score: "SCORE",
+    restart: "Restart",
+    ach_unlocked: "Achievement unlocked!",
+    ach_group_hug: "Group Hug ×10",
+    ach_all_weapons: "All Weapons",
+    ach_pacifist: "Pacifist",
+    ach_all_chests: "All Chests",
+    ach_all_cards: "All Cards",
+  },
+  zh: {
+    you_died: "你死了",
+    respawn: "重生",
+    ok: "好的！",
+    shelter: "🛡️ 在避难所",
+    xp: "经验",
+    combo: "连击",
+    chests: "宝箱",
+    cards: "明信片",
+    victory: "胜利！",
+    score: "分数",
+    restart: "重新开始",
+    ach_unlocked: "成就已解锁！",
+    ach_group_hug: "拥抱 ×10",
+    ach_all_weapons: "全武器",
+    ach_pacifist: "和平主义者",
+    ach_all_chests: "全宝箱",
+    ach_all_cards: "全明信片",
+  },
+  fr: {
+    you_died: "VOUS ÊTES MORT",
+    respawn: "Renaître",
+    ok: "OK !",
+    shelter: "🛡️ À L’ABRI",
+    xp: "XP",
+    combo: "COMBO",
+    chests: "COFFRES",
+    cards: "CARTES",
+    victory: "VICTOIRE !",
+    score: "SCORE",
+    restart: "Recommencer",
+    ach_unlocked: "Succès débloqué !",
+    ach_group_hug: "Câlins ×10",
+    ach_all_weapons: "Toutes les armes",
+    ach_pacifist: "Pacifiste",
+    ach_all_chests: "Tous les coffres",
+    ach_all_cards: "Toutes les cartes",
+  },
+  de: {
+    you_died: "DU BIST GESTORBEN",
+    respawn: "Wiederbeleben",
+    ok: "OK!",
+    shelter: "🛡️ IM SCHUTZ",
+    xp: "XP",
+    combo: "KOMBO",
+    chests: "TRUHEN",
+    cards: "KARTEN",
+    victory: "SIEG!",
+    score: "PUNKTE",
+    restart: "Neustart",
+    ach_unlocked: "Erfolg freigeschaltet!",
+    ach_group_hug: "Umarmung ×10",
+    ach_all_weapons: "Alle Waffen",
+    ach_pacifist: "Pazifist",
+    ach_all_chests: "Alle Truhen",
+    ach_all_cards: "Alle Karten",
+  },
+  es: {
+    you_died: "HAS MUERTO",
+    respawn: "Reaparecer",
+    ok: "¡OK!",
+    shelter: "🛡️ EN REFUGIO",
+    xp: "XP",
+    combo: "COMBO",
+    chests: "COFRES",
+    cards: "POSTALES",
+    victory: "¡VICTORIA!",
+    score: "PUNTOS",
+    restart: "Reiniciar",
+    ach_unlocked: "¡Logro desbloqueado!",
+    ach_group_hug: "Abrazos ×10",
+    ach_all_weapons: "Todas las armas",
+    ach_pacifist: "Pacifista",
+    ach_all_chests: "Todos los cofres",
+    ach_all_cards: "Todas las postales",
+  },
+  ja: {
+    you_died: "しんでしまった！",
+    respawn: "リスポーン",
+    ok: "OK！",
+    shelter: "🛡️ シェルター内",
+    xp: "XP",
+    combo: "コンボ",
+    chests: "チェスト",
+    cards: "カード",
+    victory: "クリア！",
+    score: "スコア",
+    restart: "リスタート",
+    ach_unlocked: "実績解除！",
+    ach_group_hug: "ハグ ×10",
+    ach_all_weapons: "全武器",
+    ach_pacifist: "非暴力",
+    ach_all_chests: "全チェスト",
+    ach_all_cards: "全カード",
+  },
+  it: {
+    you_died: "SEI MORTO",
+    respawn: "Rinasci",
+    ok: "OK!",
+    shelter: "🛡️ AL RIPARO",
+    xp: "XP",
+    combo: "COMBO",
+    chests: "BAULI",
+    cards: "CARTOLINE",
+    victory: "VITTORIA!",
+    score: "PUNTEGGIO",
+    restart: "Ricomincia",
+    ach_unlocked: "Obiettivo sbloccato!",
+    ach_group_hug: "Abbracci ×10",
+    ach_all_weapons: "Tutte le armi",
+    ach_pacifist: "Pacifista",
+    ach_all_chests: "Tutti i bauli",
+    ach_all_cards: "Tutte le cartoline",
+  }
+};
+
+function t(key) {
+  const pack = I18N[LANG] || I18N.ru;
+  return pack[key] || I18N.ru[key] || key;
+}
+
+function applyLanguageToUI() {
+  const closeBtn = document.getElementById("close-card-btn");
+  if (closeBtn) closeBtn.innerText = t("ok");
+  const house = document.getElementById("house-status");
+  if (house) house.innerText = t("shelter");
+  const xpL = document.getElementById("xp-label");
+  if (xpL) xpL.innerText = t("xp");
+  const comboL = document.getElementById("combo-label");
+  if (comboL) comboL.innerText = t("combo");
+  const chL = document.getElementById("chests-label");
+  if (chL) chL.innerText = t("chests");
+  const caL = document.getElementById("cards-label");
+  if (caL) caL.innerText = t("cards");
+
+  const yd = document.getElementById("you-died-title");
+  if (yd) yd.innerText = t("you_died");
+  const rb = document.getElementById("respawn-btn");
+  if (rb) rb.innerText = t("respawn");
+
+  // victory
+  const v = document.getElementById("victory");
+  if (v) {
+    v.querySelector("div").innerText = t("victory");
+    document.getElementById("victory-score-label").innerText = t("score");
+    document.getElementById("victory-chests-label").innerText = t("chests");
+    document.getElementById("victory-cards-label").innerText = t("cards");
+    document.getElementById("victory-restart-label").innerText = t("restart");
+  }
+
+  // achievement toast top line updates when shown
+}
+
+// ===================== Achievements + Progress =====================
+let totalChests = 0, openedChests = 0;
+let totalCards = 0, foundCards = 0, readCards = 0;
+let pacifistFailed = false;
+let hugCount = 0;
+const hugCooldown = new Map(); // "id1-id2" -> lastTimeMs
+const unlocked = new Set();
+
+function showAchievement(key) {
+  if (unlocked.has(key)) return;
+  unlocked.add(key);
+
+  const toast = document.getElementById("ach-toast");
+  const top = document.getElementById("ach-toast-top");
+  const name = document.getElementById("ach-toast-name");
+  if (!toast || !top || !name) return;
+
+  top.innerText = t("ach_unlocked");
+  name.innerText = t(key);
+
+  toast.style.display = "block";
+  toast.style.opacity = "1";
+  setTimeout(() => { toast.style.opacity = "0"; }, 2300);
+  setTimeout(() => { toast.style.display = "none"; }, 2700);
+}
+
+function updateProgressUI() {
+  const cn = document.getElementById("chests-num");
+  const ct = document.getElementById("chests-total");
+  const kn = document.getElementById("cards-num");
+  const kt = document.getElementById("cards-total");
+  if (cn) cn.innerText = openedChests;
+  if (ct) ct.innerText = totalChests;
+  if (kn) kn.innerText = foundCards;
+  if (kt) kt.innerText = totalCards;
+}
+
+function checkWin() {
+  if (totalCards > 0 && readCards >= totalCards) {
+    // all cards found = victory
+    showAchievement("ach_all_cards");
+    // pacifist achievement is checked at the end
+    if (!pacifistFailed) showAchievement("ach_pacifist");
+    if (openedChests >= totalChests && totalChests > 0) showAchievement("ach_all_chests");
+    if (inventory.includes("gun") && inventory.includes("sword") && inventory.includes("axe")) showAchievement("ach_all_weapons");
+
+    // show victory overlay
+    const v = document.getElementById("victory");
+    if (v) {
+      document.getElementById("victory-score").innerText = score;
+      document.getElementById("victory-chests").innerText = openedChests;
+      document.getElementById("victory-chests-total").innerText = totalChests;
+      document.getElementById("victory-cards").innerText = readCards;
+      document.getElementById("victory-cards-total").innerText = totalCards;
+
+      const list = [];
+      if (unlocked.has("ach_group_hug")) list.push("• " + t("ach_group_hug"));
+      if (unlocked.has("ach_all_weapons")) list.push("• " + t("ach_all_weapons"));
+      if (unlocked.has("ach_pacifist")) list.push("• " + t("ach_pacifist"));
+      if (unlocked.has("ach_all_chests")) list.push("• " + t("ach_all_chests"));
+      if (unlocked.has("ach_all_cards")) list.push("• " + t("ach_all_cards"));
+      document.getElementById("victory-achievements").innerText = list.length ? list.join("\n") : "";
+      v.style.display = "block";
+      victoryJustOpenedAt = performance.now();
+      isDead = true; // freeze loop controls
+      document.exitPointerLock();
+    }
+  }
+}
+
+
+// ====== WORLD BOUNDS (чтобы нельзя уйти за карту) ======
+const WORLD_SIZE = 300;                // совпадает с PlaneGeometry(300,300)
+const WORLD_HALF = WORLD_SIZE * 0.5;   // 150
+const WORLD_MARGIN = 3;                // запас от края
+const WORLD_MIN = -WORLD_HALF + WORLD_MARGIN;
+const WORLD_MAX =  WORLD_HALF - WORLD_MARGIN;
+
+// ====== MOB LIMITS (чтобы мобы не уходили далеко) ======
+const MOB_HOME_RADIUS = 28;            // радиус прогулки вокруг точки спавна
+const MOB_PLAYER_MAX_DIST = 70;        // если дальше — возвращаем к дому
+const MOB_WORLD_CLAMP_MARGIN = 2.5;    // запас от края для мобов
+
+// ====== PARAMS (default) ======
+let SKY_TEXT_MSG = "HAPPY BIRTHDAY MAX";
+let compliments = ["You're genious!", "You are the best!", "May all your dreams come true!", "You're funny and creative!", "Cool gamer!"];
+let availableCompliments = [...compliments];
+
+// ====== LOAD LEVEL DATA FROM ?id=... (editor publishes texts/data/<id>.json) ======
+const DATA_BASE_URL = "https://kgbgamelab.github.io/texts/data/";
+
+function getLevelIdFromUrl() {
+  const sp = new URLSearchParams(location.search);
+  return sp.get("id") || "";
+}
+
+
+function extractImageUrl(text) {
+  const s = String(text || "");
+  // markdown image ![](url)
+  const md = s.match(/!\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/i);
+  if (md && md[1]) return md[1];
+
+  // plain url
+  const m = s.match(/(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp))/i);
+  if (m && m[1]) return m[1];
+
+  return "";
+}
+
+function setCardContent(rawText) {
+  const cardText = document.getElementById("card-text");
+  if (!cardText) return;
+
+  // reset
+  cardText.innerHTML = "";
+  if (activeCardParallax) {
+    activeCardParallax.remove();
+    activeCardParallax = null;
+  }
+
+  const imgUrl = extractImageUrl(rawText);
+  const cleanText = String(rawText || "").replace(/!\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/ig, "").replace(/https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp)/ig, "").trim();
+
+  const txtDiv = document.createElement("div");
+  txtDiv.textContent = cleanText || rawText || "";
+  cardText.appendChild(txtDiv);
+
+  if (imgUrl) {
+    const media = document.createElement("div");
+    media.className = "card-media";
+    const img = document.createElement("img");
+    img.src = imgUrl;
+    img.alt = "";
+    media.appendChild(img);
+    cardText.appendChild(media);
+    activeCardParallax = media;
+
+    const onMove = (e) => {
+      const r = media.getBoundingClientRect();
+      const cx = r.left + r.width/2;
+      const cy = r.top + r.height/2;
+      const dx = (e.clientX - cx) / (r.width/2);
+      const dy = (e.clientY - cy) / (r.height/2);
+      const tx = dx * 14;   // translate
+      const ty = dy * 10;
+      img.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(1.05)`;
+    };
+    media.addEventListener("mousemove", onMove);
+    media.addEventListener("mouseleave", () => {
+      img.style.transform = "translate3d(0,0,0) scale(1.02)";
+    });
+  }
+}
+
+function normalizeBalloons(v) {
+  if (Array.isArray(v)) return v.map(x => String(x).trim()).filter(Boolean);
+  if (typeof v === "string") return v.split("\n").map(s => s.trim()).filter(Boolean);
+  return [];
+}
+
+// ✅ Теперь надпись в небе — ЛЮБОЙ ЯЗЫК (рисуем текст на canvas, а не кубиками).
+function sanitizeSkyText(s) {
+  const raw = String(s ?? "").trim();
+  if (!raw) return "HAPPY BIRTHDAY MAX";
+  // мягкий лимит, чтобы полотно не превращалось в кашу
+  return raw.length > 40 ? raw.slice(0, 40) : raw;
+}
+
+async function loadLevelData() {
+  const id = getLevelIdFromUrl();
+  if (!id) return;
+
+  try {
+    const url = `${DATA_BASE_URL}${encodeURIComponent(id)}.json?v=${Date.now()}`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`data not found (${res.status})`);
+
+    const j = await res.json();
+    const data = j.data || j; // ✅ как в твоём примере
+
+    LANG = (data.lang || 'ru');
+    SKY_TEXT_MSG = sanitizeSkyText(data.skyText);
+    applyLanguageToUI();
+
+    const list = normalizeBalloons(data.balloons);
+    if (list.length) {
+      compliments = list;
+      availableCompliments = [...compliments];
+    }
+
+    // loaded
+  } catch (e) {
+    console.warn("LEVEL LOAD FAIL:", e);
+  }
+}
+
+const clock = new THREE.Clock();
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// --- СЕРДЕЧКО (текстура) ---
+const heartCanvas = document.createElement('canvas'); heartCanvas.width = 64; heartCanvas.height = 64;
+const hCtx = heartCanvas.getContext('2d');
+hCtx.font = '50px serif'; hCtx.textAlign = 'center'; hCtx.textBaseline = 'middle'; hCtx.fillText('❤️', 32, 32);
+const heartTexture = new THREE.CanvasTexture(heartCanvas);
+
+// --- АУДИО ---
+const FOOTSTEP_URL = 'https://raw.githack.com/kgbgamelab/minecraft/main/footsteps.wav';
+let footstepBuffer = null;
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load(FOOTSTEP_URL, (b) => { footstepBuffer = b; console.log("Шаги OK"); });
+
+function playSound(type) {
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  const t = audioCtx.currentTime;
+  const g = audioCtx.createGain(); g.connect(audioCtx.destination);
+
+  if(type === 'step' && footstepBuffer) {
+    const src = audioCtx.createBufferSource(); src.buffer = footstepBuffer;
+    src.playbackRate.value = 0.95 + Math.random() * 0.1; g.gain.value = 1.0;
+    src.connect(g); src.start(0);
+    src.stop(t + 0.25);
+  } else if (type === 'music') {
+    const notes = [261.63, 261.63, 293.66, 261.63, 349.23, 329.63,
+                   261.63, 261.63, 293.66, 261.63, 392.00, 349.23];
+    const durations = [0.2, 0.2, 0.4, 0.4, 0.4, 0.8,
+                       0.2, 0.2, 0.4, 0.4, 0.4, 0.8];
+    let now = t;
+    for(let i=0; i<notes.length; i++) {
+      const osc = audioCtx.createOscillator();
+      const noteG = audioCtx.createGain();
+      osc.connect(noteG); noteG.connect(audioCtx.destination);
+      osc.type = 'square';
+      osc.frequency.value = notes[i];
+      noteG.gain.setValueAtTime(0.1, now);
+      noteG.gain.exponentialRampToValueAtTime(0.001, now + durations[i]);
+      osc.start(now);
+      osc.stop(now + durations[i]);
+      now += durations[i];
+    }
+  }
+  else {
+    const osc = audioCtx.createOscillator(); osc.connect(g);
+    if(type === 'shoot') {
+      osc.type='sawtooth';
+      osc.frequency.setValueAtTime(1200, t);
+      osc.frequency.exponentialRampToValueAtTime(100, t + 0.15);
+      g.gain.setValueAtTime(0.2, t);
+      g.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+      osc.start(); osc.stop(t + 0.15);
+    }
+    else if(type === 'sword_hit') {
+      osc.type='square'; osc.frequency.setValueAtTime(100, t); g.gain.setValueAtTime(0.5, t); g.gain.linearRampToValueAtTime(0, t + 0.1); osc.start(); osc.stop(t + 0.1);
+    }
+    else if(type === 'bow') { osc.type='triangle'; osc.frequency.setValueAtTime(600, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.2); osc.start(); osc.stop(t+0.2); }
+    else if(type === 'hit') { osc.type='sawtooth'; osc.frequency.setValueAtTime(100, t); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.2); osc.start(); osc.stop(t+0.2); }
+    else if(type === 'loot') { osc.type='sine'; osc.frequency.setValueAtTime(1200, t); g.gain.setValueAtTime(0.3, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.5); osc.start(); osc.stop(t+0.5); }
+    else if(type === 'break') { osc.type='sawtooth'; osc.frequency.setValueAtTime(50, t); g.gain.setValueAtTime(0.8, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.4); osc.start(); osc.stop(t+0.4); }
+    else if(type === 'pop') { osc.type='sawtooth'; osc.frequency.setValueAtTime(400, t); osc.frequency.exponentialRampToValueAtTime(10, t+0.1); g.gain.linearRampToValueAtTime(0, t+0.1); osc.start(); osc.stop(t+0.1); }
+    else if(type === 'heal') { osc.type='sine'; osc.frequency.setValueAtTime(400, t); osc.frequency.linearRampToValueAtTime(800, t+0.3); g.gain.setValueAtTime(0.3, t); g.gain.linearRampToValueAtTime(0, t+0.3); osc.start(); osc.stop(t+0.3); }
+  }
+}
+
+// --- ТЕКСТУРЫ ---
+function createTexture(type) {
+  const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64; const ctx = canvas.getContext('2d');
+  const fillNoise = (c) => { ctx.fillStyle = c; ctx.fillRect(0,0,64,64); for(let i=0; i<400; i++) { ctx.fillStyle=`rgba(0,0,0,0.1)`; ctx.fillRect(Math.random()*64,Math.random()*64,4,4); }};
+
+  if(type === 'grass_top') { fillNoise('#5da34b'); ctx.fillStyle='#4a8f3a'; for(let i=0;i<50;i++) ctx.fillRect(Math.random()*60,Math.random()*60,4,4); }
+  else if (type === 'side') { fillNoise('#6d4e34'); ctx.fillStyle='#5da34b'; ctx.fillRect(0,0,64,15); }
+  else if (type === 'wood') { ctx.fillStyle='#5c4033'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#4a332a'; for(let i=1;i<4;i++) ctx.fillRect(i*16,0,4,64); }
+  else if (type === 'planks') { ctx.fillStyle='#a07040'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#805020'; ctx.fillRect(0,0,64,2); ctx.fillRect(0,20,64,2); ctx.fillRect(0,40,64,2); }
+  else if (type === 'face') { fillNoise('#bcaea5'); ctx.fillStyle='#222'; ctx.fillRect(10,20,12,12); ctx.fillRect(42,20,12,12); ctx.fillStyle='#633'; ctx.fillRect(20,45,24,8); }
+  else if (type === 'leaves') { fillNoise('#2d5a27'); ctx.fillStyle='#3e7a37'; for(let i=0;i<60;i++) ctx.fillRect(Math.random()*60,Math.random()*60,6,6); }
+  else if (type === 'chest') { ctx.fillStyle='#6d4e34'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#000'; ctx.strokeRect(2,2,60,60); ctx.fillStyle='#FFD700'; ctx.fillRect(28,24,8,12); }
+  else if (type === 'skel_body') { ctx.fillStyle='#333'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#ddd'; ctx.fillRect(28, 0, 8, 64); for(let i=10; i<50; i+=10) ctx.fillRect(10, i, 44, 4); }
+  else if (type === 'skel_face') { ctx.fillStyle='#ccc'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#111'; ctx.fillRect(10,20,16,14); ctx.fillRect(38,20,16,14); ctx.fillRect(28,40,8,8); ctx.fillStyle='#555'; ctx.fillRect(10,55,44,4); }
+
+  const tex = new THREE.CanvasTexture(canvas); tex.magFilter = THREE.NearestFilter; return tex;
+}
+const textures = { grass: createTexture('grass_top'), side: createTexture('side'), wood: createTexture('wood'), planks: createTexture('planks'), face: createTexture('face'), leaves: createTexture('leaves'), chest: createTexture('chest'), skel_body: createTexture('skel_body'), skel_face: createTexture('skel_face') };
+
+let skyBannerMesh = null;
+
+function init() {
+  scene = new THREE.Scene(); scene.background = new THREE.Color(0x2DBBFF); scene.fog = null;
+  camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000); camera.rotation.order = 'YXZ';
+  weaponGroup = new THREE.Group(); scene.add(weaponGroup);
+
+  renderer = new THREE.WebGLRenderer({ antialias: false }); renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.body.appendChild(renderer.domElement);
+
+  // force bright sky clear color (prevents white/grey wash)
+  renderer.setClearColor(0x2DBBFF, 1);
+
+  buildSky();
+
+  const ambient = new THREE.AmbientLight(0xffffff, 0.5); scene.add(ambient);
+  const sun = new THREE.DirectionalLight(0xffffff, 0.8); sun.position.set(50, 100, 50); sun.castShadow = true;
+  sun.shadow.mapSize.width = 2048; sun.shadow.mapSize.height = 2048; scene.add(sun);
+
+  applyLanguageToUI();
+  createWorld();
+  setWeapon('gun');
+  spawnLoot();
+  spawnFlowers();
+  spawnBalloons();
+  totalCards = compliments.length;
+  document.getElementById('cards-total').innerText = totalCards;
+  updateProgressUI();
+  createSkyText(); // ✅ теперь canvas-banner, не обрезается и любой язык
+
+  // card close
+  const closeBtn = document.getElementById('close-card-btn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const card = document.getElementById('bday-card');
+      if (card) card.style.display = 'none';
+      isModalOpen = false;
+
+      // если последняя открытка уже прочитана — показываем финал ПОСЛЕ закрытия, но на следующем тике
+      if (pendingVictory) {
+        pendingVictory = false;
+        setTimeout(() => checkWin(), 0);
+        return;
+      }
+
+      if (!isDead) document.body.requestPointerLock();
+    });
+  }
+
+
+  document.addEventListener('keydown', e => {
+    if(isDead) return;
+    if(e.key === '1') setWeapon('gun');
+    if(e.key === '2' && inventory.includes('sword')) setWeapon('sword');
+    if(e.key === '3' && inventory.includes('axe')) setWeapon('axe');
+    if(e.code === 'Space') { move.jump = true; }
+    if(e.code === 'ShiftLeft') { move.sprint = true; }
+    handleKeys(e.code, true);
+  });
+  document.addEventListener('keyup', e => {
+    if(e.code === 'Space') move.jump = false;
+    if(e.code === 'ShiftLeft') move.sprint = false;
+    handleKeys(e.code, false);
+  });
+  document.addEventListener('mousedown', attack);
+  document.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('resize', () => {
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+  animate();
+}
+
+// ✅ НОВАЯ надпись в небе: текст рисуется на canvas → texture → plane.
+// Поддерживает кириллицу/китайский/японский/любой Unicode (если есть шрифт в системе).
+function createSkyText() {
+  if (skyBannerMesh) {
+    scene.remove(skyBannerMesh);
+    skyBannerMesh.geometry?.dispose?.();
+    skyBannerMesh.material?.map?.dispose?.();
+    skyBannerMesh.material?.dispose?.();
+    skyBannerMesh = null;
+  }
+
+  const text = String(SKY_TEXT_MSG || "").trim() || "HAPPY BIRTHDAY MAX";
+
+  const c = document.createElement("canvas");
+c.width = 3072;
+  c.height = 512;
+  const ctx = c.getContext("2d");
+
+  // фон прозрачный
+  ctx.clearRect(0,0,c.width,c.height);
+
+  // лёгкая тень + обводка, чтобы читалось
+  const fontSize = 200;
+  ctx.font = `${fontSize}px VT323, Arial, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.lineWidth = 18;
+  ctx.strokeStyle = "rgba(0,0,0,0.85)";
+  ctx.fillStyle = "#ffffff";
+
+  // auto-fit: если строка очень длинная — уменьшаем размер
+  let size = fontSize;
+  while (size > 90) {
+    ctx.font = `${size}px VT323, Arial, sans-serif`;
+    const w = ctx.measureText(text).width;
+    if (w < c.width * 0.92) break;
+    size -= 10;
+  }
+
+  ctx.font = `${size}px VT323, Arial, sans-serif`;
+  ctx.strokeText(text, c.width/2, c.height/2);
+  ctx.fillText(text, c.width/2, c.height/2);
+
+
+  // contrast pass: brighten dense areas a bit
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = "rgba(255,255,255,0.06)";
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.globalCompositeOperation = "source-over";
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  tex.needsUpdate = true;
+
+  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false });
+  const geo = new THREE.PlaneGeometry(95, 18); // размер баннера
+  skyBannerMesh = new THREE.Mesh(geo, mat);
+
+  // позиция “в небе”
+  skyBannerMesh.position.set(0, 42, -80); // ✅ дальше от камеры = меньше шанс обреза
+
+  // чуть наклонить вниз, чтобы красиво в кадре
+  skyBannerMesh.rotation.x = -0.10;
+
+  scene.add(skyBannerMesh);
+}
+
+
+// ===================== SKY (procedural clouds) =====================
+let skyDome = null;
+let cloudPlane = null;
+
+function makeGradientSkyTexture() {
+  const c = document.createElement("canvas");
+  c.width = 1024; c.height = 1024;
+  const ctx = c.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, c.height);
+  g.addColorStop(0.0, "#2DBBFF");
+  g.addColorStop(0.65, "#89E5FF");
+  g.addColorStop(1.0, "#DFF8FF");
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,c.width,c.height);
+
+  // pixel-ish sun (square)
+  ctx.save();
+  ctx.translate(780, 170);
+  ctx.fillStyle = "rgba(255, 243, 161, 0.95)";
+  ctx.fillRect(-60,-60,120,120);
+  ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+  ctx.fillRect(-35,-35,70,70);
+  ctx.restore();
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function makeCloudTexture(seed = 0) {
+  const c = document.createElement("canvas");
+  c.width = 1024; c.height = 1024;
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0,0,c.width,c.height);
+
+  function rnd() {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return (seed & 0xffffff) / 0xffffff;
+  }
+
+  // draw many mid-size blocks so it looks like minecraft clouds, not giant arcs
+  for (let i=0; i<60; i++) {
+    const x = Math.floor(rnd() * 980);
+    const y = Math.floor(rnd() * 940);
+    const w = 80 + Math.floor(rnd() * 180);
+    const h = 30 + Math.floor(rnd() * 80);
+
+    const alpha = 0.55 + rnd()*0.25;
+
+    // main
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.fillRect(x, y, w, h);
+
+    // highlight
+    ctx.fillStyle = `rgba(255,255,255,${alpha*0.65})`;
+    ctx.fillRect(x, y, w, Math.max(8, Math.floor(h*0.32)));
+
+    // subtle shadow
+    ctx.fillStyle = `rgba(160,200,220,${alpha*0.20})`;
+    ctx.fillRect(x, y + Math.floor(h*0.72), w, Math.max(6, Math.floor(h*0.28)));
+  }
+
+  // soften a bit
+  ctx.globalAlpha = 0.18;
+  ctx.drawImage(c, 2, 2);
+  ctx.drawImage(c, -2, -2);
+  ctx.globalAlpha = 1;
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function buildSky() {
+  // remove old
+  if (skyDome) {
+    scene.remove(skyDome);
+    skyDome.geometry.dispose();
+    if (skyDome.material.map) skyDome.material.map.dispose();
+    skyDome.material.dispose();
+    skyDome = null;
+  }
+  if (cloudPlane) {
+    scene.remove(cloudPlane);
+    cloudPlane.geometry.dispose();
+    if (cloudPlane.material.map) cloudPlane.material.map.dispose();
+    cloudPlane.material.dispose();
+    cloudPlane = null;
+  }
+
+  const geo = new THREE.SphereGeometry(450, 32, 16);
+
+  // gradient dome
+  skyDome = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+    map: makeGradientSkyTexture(),
+    side: THREE.BackSide,
+    depthWrite: false
+  }));
+  scene.add(skyDome);
+
+  // cloud plane (no weird sphere distortion)
+  const planeGeo = new THREE.PlaneGeometry(900, 900, 1, 1);
+  const cloudTex = makeCloudTexture(12345);
+  cloudTex.wrapS = cloudTex.wrapT = THREE.RepeatWrapping;
+  cloudTex.repeat.set(1.6, 1.6);
+
+  cloudPlane = new THREE.Mesh(planeGeo, new THREE.MeshBasicMaterial({
+    map: cloudTex,
+    transparent: true,
+    opacity: 0.78,
+    depthWrite: false
+  }));
+  cloudPlane.rotation.x = -Math.PI / 2;
+  cloudPlane.position.y = 220;
+  scene.add(cloudPlane);
+
+  // no fog (keeps colors punchy)
+  scene.fog = null;
+  scene.background = new THREE.Color(0x2DBBFF);
+}
+
+
+// ===================== DECOR (birds + flowers) =====================
+let birds = [];
+let flowers = [];
+let birdMat = null;
+
+function spawnBirds() { /* birds disabled */ }
+
+function spawnFlowers() {
+  const colors = [0xff4fd8, 0xffff55, 0x55ff77, 0x55aaff, 0xff9955];
+  for (let i=0; i<120; i++) {
+    const c = colors[i % colors.length];
+    const stem = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.18, 0.06), new THREE.MeshLambertMaterial({color: 0x2ecc71}));
+    const bud = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.14), new THREE.MeshLambertMaterial({color: c}));
+    bud.position.y = 0.16;
+    const f = new THREE.Group();
+    f.add(stem, bud);
+    f.position.set(Math.random()*95 - 47.5, 0.09, Math.random()*95 - 47.5);
+    f.rotation.y = Math.random()*Math.PI*2;
+    scene.add(f);
+    flowers.push(f);
+  }
+}
+
+function updateDecor(delta, now) {
+  // birds disabled
+
+  // tiny flower sway
+  for (const f of flowers) {
+    f.rotation.y += Math.sin(now*0.7 + f.position.x*0.03) * delta * 0.05;
+  }
+}
+
+
+
+function createWorld() {
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshLambertMaterial({map: textures.grass}));
+  floor.rotation.x = -Math.PI/2; floor.receiveShadow = true;
+  floor.material.map.wrapS = floor.material.map.wrapT = THREE.RepeatWrapping; floor.material.map.repeat.set(100, 100);
+  scene.add(floor);
+
+  createHouse(20, 0, 20); createHouse(-30, 0, -30); createHouse(40, 0, -10);
+
+  for(let i=0; i<40; i++) {
+    const x = Math.random()*200-100; const z = Math.random()*200-100;
+    let tooClose = false; houses.forEach(h => { if(new THREE.Vector3(x,0,z).distanceTo(h.pos) < 8) tooClose = true; });
+    if(!tooClose && (Math.abs(x)>10 || Math.abs(z)>10)) createTree(x, z);
+  }
+
+  for(let i=0; i<15; i++) {
+    const type = Math.random()>0.5?'zombie':'skeleton';
+    const m = createMob(type, type);
+    m.position.set(Math.random()*60-30, 0, Math.random()*60-30);
+
+    // ✅ запоминаем "дом" моба (точка спавна)
+    m.userData.home = m.position.clone();
+
+    scene.add(m); targets.push({obj: m});
+  }
+}
+
+function createHouse(x, y, z) {
+  const grp = new THREE.Group();
+  const wallMat = new THREE.MeshLambertMaterial({map: textures.wood}); const floorMat = new THREE.MeshLambertMaterial({map: textures.planks});
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(7, 0.2, 7), floorMat); floor.position.y = 0.1; grp.add(floor);
+  const w1 = new THREE.Mesh(new THREE.BoxGeometry(7, 4, 0.5), wallMat); w1.position.set(0,2,-3.5); grp.add(w1);
+  const w2 = new THREE.Mesh(new THREE.BoxGeometry(7, 4, 0.5), wallMat); w2.position.set(0,2,3.5); grp.add(w2);
+  const w3 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 7), wallMat); w3.position.set(-3.5,2,0); grp.add(w3);
+  const w4a = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 2.5), wallMat); w4a.position.set(3.5,2,-2.25); grp.add(w4a);
+  const w4b = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 2.5), wallMat); w4b.position.set(3.5,2,2.25); grp.add(w4b);
+  const bed = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.5, 2.5), new THREE.MeshLambertMaterial({color: 0xcc0000})); bed.position.set(-2, 0.5, -2); grp.add(bed);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(6, 3, 4), new THREE.MeshLambertMaterial({color: 0x5a3a22})); roof.position.y = 5.5; roof.rotation.y = Math.PI/4; grp.add(roof);
+  grp.position.set(x, y, z); scene.add(grp);
+  houses.push({ mesh: grp, pos: new THREE.Vector3(x, y, z), hp: 15, bounds: { minX: x - 3.8, maxX: x + 3.8, minZ: z - 3.8, maxZ: z + 3.8 } });
+}
+
+function createTree(x, z) {
+  const group = new THREE.Group();
+  const trunk = new THREE.Mesh(new THREE.BoxGeometry(1, 5, 1), new THREE.MeshLambertMaterial({map: textures.wood})); trunk.position.y = 2.5; trunk.castShadow = true;
+  const leafGeo = new THREE.BoxGeometry(1, 1, 1); const leafMat = new THREE.MeshLambertMaterial({map: textures.leaves, color: 0x2d5a27});
+  for(let lx=-2; lx<=2; lx++) for(let ly=0; ly<=2; ly++) for(let lz=-2; lz<=2; lz++)
+    if(Math.abs(lx)+Math.abs(ly)+Math.abs(lz) < 4) { const l = new THREE.Mesh(leafGeo, leafMat); l.position.set(lx, 4+ly, lz); group.add(l); }
+  group.add(trunk); group.position.set(x, 0, z); scene.add(group);
+}
+
+/* ✅ ВАЖНО: твой старый спавн шаров был в глобальном коде.
+   Перенесён в функцию, чтобы:
+   - шары создавались после загрузки параметров
+   - шары создавались когда уже есть scene
+*/
+function spawnBalloons() {
+  const balloonCount = Math.max(1, compliments.length);
+  for (let i = 0; i < balloonCount; i++) {
+    const grp = new THREE.Group();
+    const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16), new THREE.MeshLambertMaterial({color: 0xff0000}));
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshLambertMaterial({color: 0xffff00}));
+    box.position.y = -2;
+    const line = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 2), new THREE.MeshBasicMaterial({color: 0xffffff}));
+    line.position.y = -1;
+    grp.add(sphere, line, box);
+    grp.position.set(Math.random()*40-20, 6 + Math.random()*2, Math.random()*40-20);
+    grp.userData = { isBalloon: true };
+    scene.add(grp);
+    balloons.push(grp);
+  }
+}
+
+function spawnCard(pos) {
+  const card = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.1, 0.5), new THREE.MeshLambertMaterial({color: 0xffffff}));
+  card.position.copy(pos); card.position.y = 2.0;
+
+  if(availableCompliments.length === 0) availableCompliments = [...compliments];
+  const index = Math.floor(Math.random() * availableCompliments.length);
+  const txt = availableCompliments.splice(index, 1)[0];
+
+  card.userData = { isCard: true, text: txt };
+  scene.add(card);
+  cards.push(card);
+}
+
+/* дальше код без изменений (как у тебя) */
+function setWeapon(type) {
+  currentWeaponType = type; weaponGroup.clear();
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
+  if(type==='gun') document.getElementById('slot-0').classList.add('active');
+  if(type==='sword') document.getElementById('slot-1').classList.add('active');
+  if(type==='axe') document.getElementById('slot-2').classList.add('active');
+  if (type === 'gun') {
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.8), new THREE.MeshLambertMaterial({color: 0x333}));
+    flash = new THREE.PointLight(0xffaa00, 0, 4); flash.position.z = -1; weaponGroup.add(body, flash);
+    weaponGroup.userData = { offset: new THREE.Vector3(0.4, -0.4, -0.6) };
+  } else if (type === 'sword') {
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.05), new THREE.MeshLambertMaterial({color: 0x88ccff})); blade.position.y = 0.5;
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033})); handle.position.y = -0.1;
+    weaponGroup.add(blade, handle);
+    weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
+  } else if (type === 'axe') {
+    const stick = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.9, 0.1), new THREE.MeshLambertMaterial({color: 0x5c4033}));
+    stick.position.y = 0.0;
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.35, 0.1), new THREE.MeshLambertMaterial({color: 0xdddddd}));
+    head.position.set(0.25, 0.35, 0);
+    weaponGroup.add(stick, head);
+    weaponGroup.userData = { offset: new THREE.Vector3(0.55, -0.55, -0.9) };
+  }
+}
+
+
+function spawnLoot() {
+  const chestGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8); const chestMat = new THREE.MeshLambertMaterial({map: textures.chest});
+  for(let i=0; i<8; i++) { const b = new THREE.Mesh(chestGeo, chestMat); b.position.set(Math.random()*80-40, 0.4, Math.random()*80-40); b.userData = { type: 'chest' }; scene.add(b); bonuses.push(b); }
+
+  // sword item
+  const sword = new THREE.Group();
+  const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.05), new THREE.MeshLambertMaterial({color: 0x88ccff})); 
+  const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033}));
+  blade.position.y=0.4; handle.position.y=-0.15; sword.add(blade, handle);
+  sword.position.set(5, 0.5, 5); sword.rotation.z = Math.PI/2; sword.userData = { type: 'sword_item' }; scene.add(sword); items.push(sword);
+
+  // axe item (new)
+  const axe = new THREE.Group();
+  const stick = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.9, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033}));
+  stick.position.y = 0.1;
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.3, 0.08), new THREE.MeshLambertMaterial({color: 0xdddddd}));
+  head.position.set(0.2, 0.35, 0);
+  axe.add(stick, head);
+  axe.position.set(-6, 0.55, -4); axe.rotation.z = Math.PI/2; axe.userData = { type: 'axe_item' }; scene.add(axe); items.push(axe);
+
+  totalChests = bonuses.length;
+  document.getElementById('chests-total').innerText = totalChests;
+}
+
+
+function createMob(text, type) {
+  const mob = new THREE.Group();
+  const isSkel = (type === 'skeleton');
+  const skinColor = isSkel ? 0xdddddd : 0x5D995D; const texFace = isSkel ? textures.skel_face : textures.face;
+  const matSkin = new THREE.MeshLambertMaterial({color: skinColor});
+  const matClothes = new THREE.MeshLambertMaterial({color: isSkel ? 0xcccccc : 0x3C50C4});
+  const headMats = [matSkin, matSkin, matSkin, matSkin, new THREE.MeshLambertMaterial({map: texFace}), matSkin];
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), isSkel ? new THREE.MeshLambertMaterial({map: textures.skel_body}) : matClothes); body.position.y = 1.125;
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), headMats); head.position.y = 1.75;
+  const w = isSkel ? 0.1 : 0.2;
+  const armGeo = new THREE.BoxGeometry(w, 0.75, w); armGeo.translate(0, -0.3, 0);
+  const armL = new THREE.Mesh(armGeo, matSkin); armL.position.set(-0.35, 1.5, 0);
+  const armR = new THREE.Mesh(armGeo, matSkin); armR.position.set(0.35, 1.5, 0);
+  const legGeo = new THREE.BoxGeometry(w, 0.75, w); legGeo.translate(0, -0.375, 0);
+  const legL = new THREE.Mesh(legGeo, matSkin); legL.position.set(-0.15, 0.75, 0);
+  const legR = new THREE.Mesh(legGeo, matSkin); legR.position.set(0.15, 0.75, 0);
+
+  const hat = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.5, 8), new THREE.MeshLambertMaterial({color: Math.random()*0xffffff}));
+  hat.position.y = 2.2;
+
+  mob.add(body, head, armL, armR, legL, legR, hat);
+  mob.userData = { parts: {armL, armR, legL, legR, body, head}, isAggro: false, aggroTimer: 0, type: type || 'zombie', shotTimer: 0,
+    walkTimer: Math.random() * 2, walkDir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(),
+    home: null // ✅ заполним после установки позиции
+  };
+  return mob;
+}
+
+function spawnFloatingText(x, y, z, text, color) {
+  const div = document.createElement('div');
+  div.className = 'float-text'; div.innerText = text; div.style.color = color;
+  if(text === 'CRIT!') div.classList.add('crit');
+  document.body.appendChild(div);
+  const vec = new THREE.Vector3(x, y + 2, z); vec.project(camera);
+  const cx = (vec.x * .5 + .5) * window.innerWidth; const cy = (-(vec.y * .5) + .5) * window.innerHeight;
+  div.style.left = cx + 'px'; div.style.top = cy + 'px';
+  setTimeout(() => div.remove(), 1000);
+}
+
+function healPlayer() {
+  if(health < 5) {
+    health++;
+    const hearts = document.querySelectorAll('.heart');
+    for(let i=0; i<hearts.length; i++) {
+      if(hearts[i].classList.contains('lost')) {
+        hearts[i].classList.remove('lost');
+        break;
+      }
+    }
+    playSound('heal');
+  }
+}
+
+function attack() {
+  if(isDead || isSwinging || isModalOpen) return;
+  isSwinging = true; swingProgress = 0;
+  if(currentWeaponType === 'gun') {
+    playSound('shoot');
+    if(flash) { flash.intensity = 2; setTimeout(()=>flash.intensity=0, 50); }
+  } else playSound('sword_hit');
+
+  const ray = new THREE.Raycaster(); ray.setFromCamera(new THREE.Vector2(0,0), camera);
+  const hits = ray.intersectObjects(scene.children, true);
+
+  if(hits.length > 0) {
+    let hit = hits[0].object; let root = hit; while(root.parent && root.parent.type !== 'Scene') root = root.parent;
+
+    if(balloons.includes(root)) {
+      playSound('pop'); playSound('music');
+      spawnFireworks(root.position);
+      scene.remove(root);
+      balloons = balloons.filter(b => b!==root);
+
+      // найдено послание (засчитываем прогресс и очки тут)
+      foundCards++;
+      score += 100;
+      updateUI();
+      updateProgressUI();
+
+      spawnCard(new THREE.Vector3(root.position.x, root.position.y, root.position.z));
+      return;
+    }
+
+    if(cards.includes(hit)) {
+      const txt = hit.userData.text;
+      setCardContent(txt);
+      document.getElementById('bday-card').style.display = 'block';
+      isModalOpen = true;
+      document.exitPointerLock();
+
+      // "прочитано" засчитываем при первом открытии карточки
+      if (!hit.userData._read) {
+        hit.userData._read = true;
+        readCards++;
+      }
+
+      // если это последняя непрочитанная — финал покажем ПОСЛЕ закрытия карточки
+      if (totalCards > 0 && readCards >= totalCards) {
+        pendingVictory = true;
+      }
+
+      return;
+    }
+
+    if(bonuses.includes(root)) { playSound('loot'); scene.remove(root); bonuses = bonuses.filter(b => b !== root);
+      openedChests++;
+      score += 200;
+      updateUI(); updateProgressUI();
+      spawnFloatingText(root.position.x, root.position.y, root.position.z, "+200", "#ffff00"); spawnParticles(root.position, 0xffff00);
+      if (openedChests >= totalChests && totalChests > 0) showAchievement('ach_all_chests');
+      return; }
+    if(items.includes(root)) { playSound('loot'); scene.remove(root); items = items.filter(i => i !== root);
+      if(root.userData.type === 'sword_item') { if(!inventory.includes('sword')) inventory.push('sword'); document.getElementById('slot-1').innerText = "🗡️"; }
+      if(root.userData.type === 'axe_item') { if(!inventory.includes('axe')) inventory.push('axe'); document.getElementById('slot-2').innerText = "🪓"; }
+      if (inventory.includes('gun') && inventory.includes('sword') && inventory.includes('axe')) showAchievement('ach_all_weapons');
+      return; }
+
+    let mobGroup = hit;
+    while(mobGroup.parent && mobGroup.type !== 'Scene' && !targets.find(t => t.obj === mobGroup)) {
+      mobGroup = mobGroup.parent;
+    }
+
+    const target = targets.find(t => t.obj === mobGroup);
+    if(target) {
+      // shot hit mob
+      if (currentWeaponType === 'gun') pacifistFailed = true;
+
+      // funny bounce
+      target.obj.userData.yVel = 7.5;
+
+      target.obj.userData.isAggro = true;
+      target.obj.userData.aggroTimer = 10;
+      spawnParticles(target.obj.position, 0xff0000, true);
+    }
+  }
+}
+
+function updateUI() {
+  document.getElementById('lvl-num').innerText = score;
+  document.getElementById('combo-num').innerText = combo;
+  document.getElementById('xp-fill').style.width = Math.min(100, (score % 1000) / 10) + '%';
+}
+
+function checkHouseProtection(pos) {
+  for(let h of houses) {
+    if (h.hp > 0 && pos.x > h.bounds.minX + 0.5 && pos.x < h.bounds.maxX - 0.5 && pos.z > h.bounds.minZ + 0.5 && pos.z < h.bounds.maxZ - 0.5) return h;
+  }
+  return null;
+}
+
+function spawnParticles(pos, color, isHeart = false) {
+  for(let i=0; i<10; i++) {
+    let p;
+    if(isHeart) {
+      const heart = new THREE.Sprite(new THREE.SpriteMaterial({map: heartTexture, color: 0xffffff}));
+      heart.scale.set(0.5, 0.5, 1);
+      p = heart;
+    } else {
+      p = new THREE.Mesh(new THREE.BoxGeometry(0.15,0.15,0.15), new THREE.MeshBasicMaterial({color: color}));
+    }
+    p.position.copy(pos);
+    scene.add(p);
+    particles.push({m:p, v: new THREE.Vector3((Math.random()-.5)*0.5, Math.random()*0.5, (Math.random()-.5)*0.5)});
+  }
+}
+
+function spawnFireworks(pos) {
+  for(let i=0; i<30; i++) {
+    const p = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), new THREE.MeshBasicMaterial({color: Math.random() * 0xffffff}));
+    p.position.copy(pos);
+    scene.add(p);
+    particles.push({m:p, v: new THREE.Vector3((Math.random()-0.5)*0.8, (Math.random()-0.5)*0.8, (Math.random()-0.5)*0.8)});
+  }
+}
+
+function handleKeys(code, state) { if(code === 'KeyW') move.fwd = state; if(code === 'KeyS') move.bwd = state; if(code === 'KeyA') move.left = state; if(code === 'KeyD') move.right = state; }
+function onMouseMove(e) { if(document.pointerLockElement && !isDead) { yaw -= e.movementX * 0.002; pitch -= e.movementY * 0.002; pitch = Math.max(-1.5, Math.min(1.5, pitch)); camera.rotation.set(pitch, yaw, 0); } }
+
+function updatePhysics(delta) {
+  player.speed = move.sprint ? 18 : 10;
+  const direction = new THREE.Vector3();
+  const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion); forward.y = 0; forward.normalize();
+  const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion); right.y = 0; right.normalize();
+  if(move.fwd) direction.add(forward); if(move.bwd) direction.sub(forward);
+  if(move.left) direction.sub(right); if(move.right) direction.add(right);
+  if(direction.length() > 0) direction.normalize().multiplyScalar(player.speed * delta);
+  if(player.onGround && move.jump) { player.vel.y = 12; player.onGround = false; }
+  player.vel.y -= 30 * delta;
+
+  let nextX = camera.position.x + (direction.x + player.vel.x * delta);
+  let nextZ = camera.position.z + (direction.z + player.vel.z * delta);
+
+  let canMoveX = true, canMoveZ = true;
+  const wallT = 0.8;
+  for(let h of houses) {
+    if(h.hp <= 0) continue;
+    if (nextX > h.bounds.minX - wallT && nextX < h.bounds.minX + wallT && camera.position.z > h.bounds.minZ && camera.position.z < h.bounds.maxZ) canMoveX = false;
+    if (nextX > h.bounds.maxX - wallT && nextX < h.bounds.maxX + wallT && camera.position.z > h.bounds.minZ && camera.position.z < h.bounds.maxZ) {
+      if (camera.position.z < h.pos.z - 1.0 || camera.position.z > h.pos.z + 1.0) canMoveX = false;
+    }
+    if (camera.position.x > h.bounds.minX && camera.position.x < h.bounds.maxX && nextZ > h.bounds.minZ - wallT && nextZ < h.bounds.minZ + wallT) canMoveZ = false;
+    if (camera.position.x > h.bounds.minX && camera.position.x < h.bounds.maxX && nextZ > h.bounds.maxZ - wallT && nextZ < h.bounds.maxZ + wallT) canMoveZ = false;
+  }
+
+  // ✅ ОГРАНИЧЕНИЕ КАРТЫ: нельзя выйти за пределы поля
+  nextX = Math.max(WORLD_MIN, Math.min(WORLD_MAX, nextX));
+  nextZ = Math.max(WORLD_MIN, Math.min(WORLD_MAX, nextZ));
+
+  if(canMoveX) camera.position.x = nextX;
+  if(canMoveZ) camera.position.z = nextZ;
+
+  camera.position.y += player.vel.y * delta;
+  if(camera.position.y < 1.7) { camera.position.y = 1.7; player.vel.y = 0; player.onGround = true; }
+
+  player.vel.x *= 0.9; player.vel.z *= 0.9;
+
+  const house = checkHouseProtection(camera.position);
+  document.getElementById('house-status').style.display = house ? 'block' : 'none';
+
+  const stepInterval = move.sprint ? 300 : 500;
+  if(direction.length() > 0 && player.onGround && Date.now() - stepTimer > stepInterval) {
+    playSound('step'); stepTimer = Date.now();
+  }
+}
+
+function animate() {
+  requestAnimationFrame(animate); if(isDead) return;
+  const delta = clock.getDelta(); const now = Date.now() / 1000;
+  updatePhysics(delta);
+
+  const offset = weaponGroup.userData.offset || new THREE.Vector3(0.5, -0.5, -0.8);
+  const bob = (move.fwd || move.bwd) ? Math.sin(now*(move.sprint?18:12))*0.03 : 0;
+  weaponGroup.position.copy(camera.position); weaponGroup.quaternion.copy(camera.quaternion);
+  weaponGroup.translateX(offset.x); weaponGroup.translateY(offset.y + bob); weaponGroup.translateZ(offset.z);
+
+  if(isSwinging) {
+    swingProgress += delta * 15;
+    if(swingProgress >= Math.PI) { swingProgress = 0; isSwinging = false; weaponGroup.rotation.x = 0; }
+    else {
+      if(currentWeaponType === 'gun') weaponGroup.position.z += Math.sin(swingProgress)*0.1;
+      else weaponGroup.rotateX(-Math.sin(swingProgress));
+    }
+  } else weaponGroup.rotateX(currentWeaponType !== 'gun' ? Math.PI/8 : 0);
+
+  // ===== MOB AI + LIMITS =====
+  targets.forEach(t => {
+    const mob = t.obj;
+    const distToPlayer = mob.position.distanceTo(camera.position);
+
+    // дом
+    const home = mob.userData.home || mob.position.clone();
+
+    // если моб улетел далеко — мягко возвращаем (или телепортим чуть ближе к дому)
+    if (distToPlayer > MOB_PLAYER_MAX_DIST) {
+      const dirHome = home.clone().sub(mob.position);
+      if (dirHome.length() > 0.001) {
+        dirHome.normalize();
+        mob.position.add(dirHome.multiplyScalar(8 * delta));
+      } else {
+        mob.position.copy(home);
+      }
+    }
+
+    if(mob.userData.isAggro) {
+      mob.userData.aggroTimer -= delta;
+      if (mob.userData.aggroTimer <= 0) mob.userData.isAggro = false;
+
+      mob.lookAt(camera.position.x, 0, camera.position.z);
+      if(distToPlayer > 2.0) {
+        mob.translateZ(6 * delta);
+      } else {
+        if(Math.random() < 0.03) {
+          healPlayer();
+          spawnParticles(mob.position, 0xff0000, true);
+        }
+      }
+    } else {
+      // гуляем вокруг дома, не уходим далеко
+      mob.userData.walkTimer -= delta;
+      if(mob.userData.walkTimer <= 0) {
+        mob.userData.walkTimer = Math.random() * 3 + 1;
+
+        // направление: либо случайное, либо назад к дому, если вышли за радиус
+        const toHome = home.clone().sub(mob.position);
+        const dHome = toHome.length();
+
+        if (dHome > MOB_HOME_RADIUS) {
+          mob.userData.walkDir = toHome.normalize();
+        } else {
+          mob.userData.walkDir = new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize();
+        }
+      }
+      mob.lookAt(mob.position.clone().add(mob.userData.walkDir));
+      mob.translateZ(1.5 * delta);
+    }
+
+    // ✅ КЛЭМП моба по карте (чтобы не уходил за край)
+    mob.position.x = Math.max(WORLD_MIN + MOB_WORLD_CLAMP_MARGIN, Math.min(WORLD_MAX - MOB_WORLD_CLAMP_MARGIN, mob.position.x));
+    mob.position.z = Math.max(WORLD_MIN + MOB_WORLD_CLAMP_MARGIN, Math.min(WORLD_MAX - MOB_WORLD_CLAMP_MARGIN, mob.position.z));
+
+    // bounce physics
+    if (typeof mob.userData.yVel === 'number') {
+      mob.userData.yVel -= 25 * delta;
+      mob.position.y += mob.userData.yVel * delta;
+      if (mob.position.y <= 0) { mob.position.y = 0; mob.userData.yVel = 0; }
+    }
+
+    const p = mob.userData.parts; const w = Math.sin(now * (mob.userData.isAggro ? 15 : 5));
+    if(mob.userData.type !== 'skeleton') { p.armL.rotation.x = w; p.armR.rotation.x = -w; }
+    p.legL.rotation.x = -w; p.legR.rotation.x = w;
+  });
+
+
+  // ===== HUG CHECK (achievement) =====
+  for (let i=0; i<targets.length; i++) {
+    for (let j=i+1; j<targets.length; j++) {
+      const a = targets[i].obj, b = targets[j].obj;
+      if (!a || !b) continue;
+      const d = a.position.distanceTo(b.position);
+      if (d < 0.9) {
+        const id1 = a.id < b.id ? a.id : b.id;
+        const id2 = a.id < b.id ? b.id : a.id;
+        const key = id1 + "-" + id2;
+        const last = hugCooldown.get(key) || 0;
+        const nowMs = Date.now();
+        if (nowMs - last > 1200) {
+          hugCooldown.set(key, nowMs);
+          hugCount++;
+          if (hugCount >= 10) showAchievement("ach_group_hug");
+        }
+      }
+    }
+  }
+
+  bonuses.forEach(b => b.rotation.y += 0.02); items.forEach(i => i.rotation.y += 0.02);
+  balloons.forEach(b => b.position.y += Math.sin(Date.now()*0.002)*0.01);
+  cards.forEach(c => c.rotation.y += 0.01);
+
+  for(let i=particles.length-1; i>=0; i--) {
+    const p = particles[i];
+    p.m.position.add(p.v);
+    p.v.y += 0.01;
+    if(p.m.position.y > 10) { scene.remove(p.m); particles.splice(i,1); }
+  }
+
+  updateDecor(delta, now);
+
+  // cloud plane follows camera and scrolls texture
+  if (cloudPlane && cloudPlane.material && cloudPlane.material.map) {
+    cloudPlane.position.x = camera.position.x;
+    cloudPlane.position.z = camera.position.z;
+    cloudPlane.material.map.offset.x = (cloudPlane.material.map.offset.x + delta * 0.010) % 1;
+    cloudPlane.material.map.offset.y = (cloudPlane.material.map.offset.y + delta * 0.004) % 1;
+  }
+
+  renderer.render(scene, camera);
+}
+
+document.body.addEventListener('click', () => {
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  const v = document.getElementById('victory');
+  if (v && v.style.display === 'block') {
+    const dt = performance.now() - (victoryJustOpenedAt || 0);
+    if (dt > 450) { location.reload(); }
+    return;
+  }
+  if(!isDead && !isModalOpen) document.body.requestPointerLock();
+});
+
+// IMPORTANT: load params first, then start game
+(async () => {
+  await loadLevelData();
+  init();
+})();
+</script>
+</body>
+</html>
