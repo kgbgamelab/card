@@ -1171,6 +1171,9 @@ function attack() {
     let hit = hits[0].object; let root = hit; while(root.parent && root.parent.type !== 'Scene') root = root.parent;
 
     if(balloons.includes(root)) {
+      // balloons can be popped ONLY with the gun
+      if(currentWeaponType !== 'gun') { return; }
+
       playSound('pop'); playSound('music');
       spawnFireworks(root.position);
       scene.remove(root);
