@@ -65,7 +65,7 @@
 
     #game-over { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 999; background: rgba(50,0,0,0.9); }
     .btn-respawn { font-size: 40px; cursor: pointer; color: #ffff55; text-decoration: underline; margin-top: 20px; }
-  
+
     #bday-card .card-media {
       margin-top: 18px;
       width: 520px;
@@ -90,7 +90,6 @@
       will-change: transform;
       image-rendering: auto;
     }
-
   </style>
 </head>
 <body>
@@ -108,7 +107,7 @@
   <div id="bottom-ui">
     <div id="xp-info">
       <span><span id="xp-label">XP</span>: <span id="lvl-num">0</span></span>
-<span style="color:#55ff55"><span id="chests-label">CHESTS</span>: <span id="chests-num">0</span>/<span id="chests-total">0</span></span>
+      <span style="color:#55ff55"><span id="chests-label">CHESTS</span>: <span id="chests-num">0</span>/<span id="chests-total">0</span></span>
       <span style="color:#55aaff"><span id="cards-label">CARDS</span>: <span id="cards-num">0</span>/<span id="cards-total">0</span></span>
     </div>
     <div class="hearts" id="hearts-container">
@@ -127,7 +126,6 @@
   <h1 id="you-died-title" style="font-size: 100px; margin:0; text-shadow: 5px 5px 0 #000; color: #ff5555;">YOU DIED</h1>
   <p id="respawn-btn" class="btn-respawn" onclick="location.reload()">Respawn</p>
 </div>
-
 
 <div id="victory" style="display:none; position:absolute; inset:0; z-index:1001; background:rgba(0,0,0,0.75); color:#fff; font-family:'VT323', monospace; text-align:center; padding-top:7vh;">
   <div style="font-size:90px; text-shadow:5px 5px 0 #000; color:#55ff55;">VICTORY!</div>
@@ -149,7 +147,6 @@
   </div>
 </div>
 
-
 <script>
 let scene, camera, renderer, weaponGroup, flash;
 let score = 0, health = 5;
@@ -167,7 +164,6 @@ let swingProgress = 0, isSwinging = false;
 let currentWeaponType = 'gun';
 let inventory = ['gun'];
 
-
 // ===================== i18n =====================
 let LANG = "ru";
 const I18N = {
@@ -177,7 +173,7 @@ const I18N = {
     ok: "ОК!",
     shelter: "🛡️ В УКРЫТИИ",
     xp: "XP",
-chests: "СУНДУКИ",
+    chests: "СУНДУКИ",
     cards: "ОТКРЫТКИ",
     victory: "ПОБЕДА!",
     score: "ОЧКИ",
@@ -195,7 +191,7 @@ chests: "СУНДУКИ",
     ok: "OK!",
     shelter: "🛡️ IN SHELTER",
     xp: "XP",
-chests: "CHESTS",
+    chests: "CHESTS",
     cards: "CARDS",
     victory: "VICTORY!",
     score: "SCORE",
@@ -213,7 +209,7 @@ chests: "CHESTS",
     ok: "好的！",
     shelter: "🛡️ 在避难所",
     xp: "经验",
-chests: "宝箱",
+    chests: "宝箱",
     cards: "明信片",
     victory: "胜利！",
     score: "分数",
@@ -231,7 +227,7 @@ chests: "宝箱",
     ok: "OK !",
     shelter: "🛡️ À L’ABRI",
     xp: "XP",
-chests: "COFFRES",
+    chests: "COFFRES",
     cards: "CARTES",
     victory: "VICTOIRE !",
     score: "SCORE",
@@ -249,7 +245,7 @@ chests: "COFFRES",
     ok: "OK!",
     shelter: "🛡️ IM SCHUTZ",
     xp: "XP",
-chests: "TRUHEN",
+    chests: "TRUHEN",
     cards: "KARTEN",
     victory: "SIEG!",
     score: "PUNKTE",
@@ -267,7 +263,7 @@ chests: "TRUHEN",
     ok: "¡OK!",
     shelter: "🛡️ EN REFUGIO",
     xp: "XP",
-chests: "COFRES",
+    chests: "COFRES",
     cards: "POSTALES",
     victory: "¡VICTORIA!",
     score: "PUNTOS",
@@ -285,7 +281,7 @@ chests: "COFRES",
     ok: "OK！",
     shelter: "🛡️ シェルター内",
     xp: "XP",
-chests: "チェスト",
+    chests: "チェスト",
     cards: "カード",
     victory: "クリア！",
     score: "スコア",
@@ -303,7 +299,7 @@ chests: "チェスト",
     ok: "OK!",
     shelter: "🛡️ AL RIPARO",
     xp: "XP",
-chests: "BAULI",
+    chests: "BAULI",
     cards: "CARTOLINE",
     victory: "VITTORIA!",
     score: "PUNTEGGIO",
@@ -328,7 +324,8 @@ function applyLanguageToUI() {
   const house = document.getElementById("house-status");
   if (house) house.innerText = t("shelter");
   const xpL = document.getElementById("xp-label");
-  if (xpL) xpL.innerText = t("xp");const chL = document.getElementById("chests-label");
+  if (xpL) xpL.innerText = t("xp");
+  const chL = document.getElementById("chests-label");
   if (chL) chL.innerText = t("chests");
   const caL = document.getElementById("cards-label");
   if (caL) caL.innerText = t("cards");
@@ -338,7 +335,6 @@ function applyLanguageToUI() {
   const rb = document.getElementById("respawn-btn");
   if (rb) rb.innerText = t("respawn");
 
-  // victory
   const v = document.getElementById("victory");
   if (v) {
     v.querySelector("div").innerText = t("victory");
@@ -347,16 +343,15 @@ function applyLanguageToUI() {
     document.getElementById("victory-cards-label").innerText = t("cards");
     document.getElementById("victory-restart-label").innerText = t("restart");
   }
-
-  // achievement toast top line updates when shown
 }
 
 // ===================== Achievements + Progress =====================
 let totalChests = 0, openedChests = 0;
 let totalCards = 0, foundCards = 0, readCards = 0;
+let totalBalloons = 0, poppedBalloons = 0;
 let pacifistFailed = false;
 let hugCount = 0;
-const hugCooldown = new Map(); // "id1-id2" -> lastTimeMs
+const hugCooldown = new Map();
 const unlocked = new Set();
 
 function showAchievement(key) {
@@ -389,15 +384,12 @@ function updateProgressUI() {
 }
 
 function checkWin() {
-  if (totalCards > 0 && readCards >= totalCards) {
-    // all cards found = victory
+  if (totalCards > 0 && readCards >= totalCards && totalBalloons > 0 && poppedBalloons >= totalBalloons) {
     showAchievement("ach_all_cards");
-    // pacifist achievement is checked at the end
     if (!pacifistFailed) showAchievement("ach_pacifist");
     if (openedChests >= totalChests && totalChests > 0) showAchievement("ach_all_chests");
     if (inventory.includes("gun") && inventory.includes("sword") && inventory.includes("axe")) showAchievement("ach_all_weapons");
 
-    // show victory overlay
     const v = document.getElementById("victory");
     if (v) {
       document.getElementById("victory-score").innerText = score;
@@ -415,31 +407,30 @@ function checkWin() {
       document.getElementById("victory-achievements").innerText = list.length ? list.join("\n") : "";
       v.style.display = "block";
       victoryJustOpenedAt = performance.now();
-      isDead = true; // freeze loop controls
+      isDead = true;
       document.exitPointerLock();
     }
   }
 }
 
-
-// ====== WORLD BOUNDS (чтобы нельзя уйти за карту) ======
-const WORLD_SIZE = 300;                // совпадает с PlaneGeometry(300,300)
-const WORLD_HALF = WORLD_SIZE * 0.5;   // 150
-const WORLD_MARGIN = 3;                // запас от края
+// ====== WORLD BOUNDS ======
+const WORLD_SIZE = 300;
+const WORLD_HALF = WORLD_SIZE * 0.5;
+const WORLD_MARGIN = 3;
 const WORLD_MIN = -WORLD_HALF + WORLD_MARGIN;
 const WORLD_MAX =  WORLD_HALF - WORLD_MARGIN;
 
-// ====== MOB LIMITS (чтобы мобы не уходили далеко) ======
-const MOB_HOME_RADIUS = 28;            // радиус прогулки вокруг точки спавна
-const MOB_PLAYER_MAX_DIST = 70;        // если дальше — возвращаем к дому
-const MOB_WORLD_CLAMP_MARGIN = 2.5;    // запас от края для мобов
+// ====== MOB LIMITS ======
+const MOB_HOME_RADIUS = 28;
+const MOB_PLAYER_MAX_DIST = 70;
+const MOB_WORLD_CLAMP_MARGIN = 2.5;
 
 // ====== PARAMS (default) ======
-let SKY_TEXT_MSG = "HAPPY BIRTHDAY MAX";
+let SKY_TEXT_MSG = "HAPPY BIRTHDAY MAX!";
 let compliments = ["You're genious!", "You are the best!", "May all your dreams come true!", "You're funny and creative!", "Cool gamer!"];
 let availableCompliments = [...compliments];
 
-// ====== LOAD LEVEL DATA FROM ?id=... (editor publishes texts/data/<id>.json) ======
+// ====== LOAD LEVEL DATA ======
 const DATA_BASE_URL = "https://kgbgamelab.github.io/texts/data/";
 
 function getLevelIdFromUrl() {
@@ -447,11 +438,8 @@ function getLevelIdFromUrl() {
   return sp.get("id") || "";
 }
 
-
-
 function normalizeLang(v) {
   const s = String(v || "").trim().toLowerCase();
-  // allow passing full language names too
   const map = {
     "ru":"ru","русский":"ru","russian":"ru",
     "en":"en","english":"en","английский":"en",
@@ -468,14 +456,10 @@ function normalizeLang(v) {
 
 function extractImageUrl(text) {
   const s = String(text || "");
-  // markdown image ![](url)
   const md = s.match(/!\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/i);
   if (md && md[1]) return md[1];
-
-  // plain url
   const m = s.match(/(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp))/i);
   if (m && m[1]) return m[1];
-
   return "";
 }
 
@@ -483,7 +467,6 @@ function setCardContent(rawText) {
   const cardText = document.getElementById("card-text");
   if (!cardText) return;
 
-  // reset
   cardText.innerHTML = "";
   if (activeCardParallax) {
     activeCardParallax.remove();
@@ -491,7 +474,10 @@ function setCardContent(rawText) {
   }
 
   const imgUrl = extractImageUrl(rawText);
-  const cleanText = String(rawText || "").replace(/!\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/ig, "").replace(/https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp)/ig, "").trim();
+  const cleanText = String(rawText || "")
+    .replace(/!\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/ig, "")
+    .replace(/https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp)/ig, "")
+    .trim();
 
   const txtDiv = document.createElement("div");
   txtDiv.textContent = cleanText || rawText || "";
@@ -513,7 +499,7 @@ function setCardContent(rawText) {
       const cy = r.top + r.height/2;
       const dx = (e.clientX - cx) / (r.width/2);
       const dy = (e.clientY - cy) / (r.height/2);
-      const tx = dx * 14;   // translate
+      const tx = dx * 14;
       const ty = dy * 10;
       img.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(1.05)`;
     };
@@ -530,12 +516,9 @@ function normalizeBalloons(v) {
   return [];
 }
 
-// ✅ Теперь надпись в небе — ЛЮБОЙ ЯЗЫК (рисуем текст на canvas, а не кубиками).
 function sanitizeSkyText(s) {
   const raw = String(s ?? "").trim();
-  if (!raw) return "HAPPY BIRTHDAY MAX";
-  // мягкий лимит, чтобы полотно не превращалось в кашу
-  return raw.length > 40 ? raw.slice(0, 40) : raw;
+  return raw || "HAPPY BIRTHDAY MAX";
 }
 
 async function loadLevelData() {
@@ -548,15 +531,13 @@ async function loadLevelData() {
     if (!res.ok) throw new Error(`data not found (${res.status})`);
 
     const j = await res.json();
-    const data = j.data || j; // ✅ как в твоём примере
+    const data = j.data || j;
 
-    
-    // язык интерфейса (из редактора)
     if (data.lang || data.language) {
       LANG = normalizeLang(data.lang || data.language);
       applyLanguageToUI();
     }
-LANG = (data.lang || 'ru');
+    LANG = (data.lang || 'ru');
     SKY_TEXT_MSG = sanitizeSkyText(data.skyText);
     applyLanguageToUI();
 
@@ -565,8 +546,6 @@ LANG = (data.lang || 'ru');
       compliments = list;
       availableCompliments = [...compliments];
     }
-
-    // loaded
   } catch (e) {
     console.warn("LEVEL LOAD FAIL:", e);
   }
@@ -575,7 +554,7 @@ LANG = (data.lang || 'ru');
 const clock = new THREE.Clock();
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// --- СЕРДЕЧКО (текстура) ---
+// --- СЕРДЕЧКО ---
 const heartCanvas = document.createElement('canvas'); heartCanvas.width = 64; heartCanvas.height = 64;
 const hCtx = heartCanvas.getContext('2d');
 hCtx.font = '50px serif'; hCtx.textAlign = 'center'; hCtx.textBaseline = 'middle'; hCtx.fillText('❤️', 32, 32);
@@ -657,155 +636,6 @@ function createTexture(type) {
 }
 const textures = { grass: createTexture('grass_top'), side: createTexture('side'), wood: createTexture('wood'), planks: createTexture('planks'), face: createTexture('face'), leaves: createTexture('leaves'), chest: createTexture('chest'), skel_body: createTexture('skel_body'), skel_face: createTexture('skel_face') };
 
-let skyBannerMesh = null;
-
-function init() {
-  scene = new THREE.Scene(); scene.background = new THREE.Color(0x2DBBFF); scene.fog = null;
-  camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000); camera.rotation.order = 'YXZ';
-  weaponGroup = new THREE.Group(); scene.add(weaponGroup);
-
-  renderer = new THREE.WebGLRenderer({ antialias: false }); renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  document.body.appendChild(renderer.domElement);
-
-  // force bright sky clear color (prevents white/grey wash)
-  renderer.setClearColor(0x2DBBFF, 1);
-
-  buildSky();
-
-  const ambient = new THREE.AmbientLight(0xffffff, 0.5); scene.add(ambient);
-  const sun = new THREE.DirectionalLight(0xffffff, 0.8); sun.position.set(50, 100, 50); sun.castShadow = true;
-  sun.shadow.mapSize.width = 2048; sun.shadow.mapSize.height = 2048; scene.add(sun);
-
-  applyLanguageToUI();
-  createWorld();
-  setWeapon('gun');
-  spawnLoot();
-  spawnFlowers();
-  spawnBalloons();
-  totalCards = compliments.length;
-  document.getElementById('cards-total').innerText = totalCards;
-  updateProgressUI();
-  createSkyText(); // ✅ теперь canvas-banner, не обрезается и любой язык
-
-  // card close
-  const closeBtn = document.getElementById('close-card-btn');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const card = document.getElementById('bday-card');
-      if (card) card.style.display = 'none';
-      isModalOpen = false;
-
-      // если последняя открытка уже прочитана — показываем финал ПОСЛЕ закрытия, но на следующем тике
-      if (pendingVictory) {
-        pendingVictory = false;
-        setTimeout(() => checkWin(), 0);
-        return;
-      }
-
-      if (!isDead) document.body.requestPointerLock();
-    });
-  }
-
-
-  document.addEventListener('keydown', e => {
-    if(isDead) return;
-    if(e.key === '1') setWeapon('gun');
-    if(e.key === '2' && inventory.includes('sword')) setWeapon('sword');
-    if(e.key === '3' && inventory.includes('axe')) setWeapon('axe');
-    if(e.code === 'Space') { move.jump = true; }
-    if(e.code === 'ShiftLeft') { move.sprint = true; }
-    handleKeys(e.code, true);
-  });
-  document.addEventListener('keyup', e => {
-    if(e.code === 'Space') move.jump = false;
-    if(e.code === 'ShiftLeft') move.sprint = false;
-    handleKeys(e.code, false);
-  });
-  document.addEventListener('mousedown', attack);
-  document.addEventListener('mousemove', onMouseMove);
-  window.addEventListener('resize', () => {
-    camera.aspect=window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-  animate();
-}
-
-// ✅ НОВАЯ надпись в небе: текст рисуется на canvas → texture → plane.
-// Поддерживает кириллицу/китайский/японский/любой Unicode (если есть шрифт в системе).
-function createSkyText() {
-  if (skyBannerMesh) {
-    scene.remove(skyBannerMesh);
-    skyBannerMesh.geometry?.dispose?.();
-    skyBannerMesh.material?.map?.dispose?.();
-    skyBannerMesh.material?.dispose?.();
-    skyBannerMesh = null;
-  }
-
-  const text = String(SKY_TEXT_MSG || "").trim() || "HAPPY BIRTHDAY MAX";
-
-  const c = document.createElement("canvas");
-c.width = 3072;
-  c.height = 512;
-  const ctx = c.getContext("2d");
-
-  // фон прозрачный
-  ctx.clearRect(0,0,c.width,c.height);
-
-  // лёгкая тень + обводка, чтобы читалось
-  const fontSize = 200;
-  ctx.font = `${fontSize}px VT323, Arial, sans-serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  ctx.lineWidth = 18;
-  ctx.strokeStyle = "rgba(0,0,0,0.85)";
-  ctx.fillStyle = "#ffffff";
-
-  // auto-fit: если строка очень длинная — уменьшаем размер
-  let size = fontSize;
-  while (size > 90) {
-    ctx.font = `${size}px VT323, Arial, sans-serif`;
-    const w = ctx.measureText(text).width;
-    if (w < c.width * 0.92) break;
-    size -= 10;
-  }
-
-  ctx.font = `${size}px VT323, Arial, sans-serif`;
-  ctx.strokeText(text, c.width/2, c.height/2);
-  ctx.fillText(text, c.width/2, c.height/2);
-
-
-  // contrast pass: brighten dense areas a bit
-  ctx.globalCompositeOperation = "source-over";
-  ctx.fillStyle = "rgba(255,255,255,0.06)";
-  ctx.fillRect(0,0,c.width,c.height);
-  ctx.globalCompositeOperation = "source-over";
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.minFilter = THREE.LinearFilter;
-  tex.magFilter = THREE.LinearFilter;
-  tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  tex.needsUpdate = true;
-
-  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false });
-  const geo = new THREE.PlaneGeometry(95, 18); // размер баннера
-  skyBannerMesh = new THREE.Mesh(geo, mat);
-
-  // позиция “в небе”
-  skyBannerMesh.position.set(0, 42, -80); // ✅ дальше от камеры = меньше шанс обреза
-
-  // чуть наклонить вниз, чтобы красиво в кадре
-  skyBannerMesh.rotation.x = -0.10;
-
-  scene.add(skyBannerMesh);
-}
-
-
 // ===================== SKY (procedural clouds) =====================
 let skyDome = null;
 let cloudPlane = null;
@@ -821,7 +651,6 @@ function makeGradientSkyTexture() {
   ctx.fillStyle = g;
   ctx.fillRect(0,0,c.width,c.height);
 
-  // pixel-ish sun (square)
   ctx.save();
   ctx.translate(780, 170);
   ctx.fillStyle = "rgba(255, 243, 161, 0.95)";
@@ -848,29 +677,23 @@ function makeCloudTexture(seed = 0) {
     return (seed & 0xffffff) / 0xffffff;
   }
 
-  // draw many mid-size blocks so it looks like minecraft clouds, not giant arcs
   for (let i=0; i<60; i++) {
     const x = Math.floor(rnd() * 980);
     const y = Math.floor(rnd() * 940);
     const w = 80 + Math.floor(rnd() * 180);
     const h = 30 + Math.floor(rnd() * 80);
-
     const alpha = 0.55 + rnd()*0.25;
 
-    // main
     ctx.fillStyle = `rgba(255,255,255,${alpha})`;
     ctx.fillRect(x, y, w, h);
 
-    // highlight
     ctx.fillStyle = `rgba(255,255,255,${alpha*0.65})`;
     ctx.fillRect(x, y, w, Math.max(8, Math.floor(h*0.32)));
 
-    // subtle shadow
     ctx.fillStyle = `rgba(160,200,220,${alpha*0.20})`;
     ctx.fillRect(x, y + Math.floor(h*0.72), w, Math.max(6, Math.floor(h*0.28)));
   }
 
-  // soften a bit
   ctx.globalAlpha = 0.18;
   ctx.drawImage(c, 2, 2);
   ctx.drawImage(c, -2, -2);
@@ -884,7 +707,6 @@ function makeCloudTexture(seed = 0) {
 }
 
 function buildSky() {
-  // remove old
   if (skyDome) {
     scene.remove(skyDome);
     skyDome.geometry.dispose();
@@ -901,8 +723,6 @@ function buildSky() {
   }
 
   const geo = new THREE.SphereGeometry(450, 32, 16);
-
-  // gradient dome
   skyDome = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
     map: makeGradientSkyTexture(),
     side: THREE.BackSide,
@@ -910,7 +730,6 @@ function buildSky() {
   }));
   scene.add(skyDome);
 
-  // cloud plane (no weird sphere distortion)
   const planeGeo = new THREE.PlaneGeometry(900, 900, 1, 1);
   const cloudTex = makeCloudTexture(12345);
   cloudTex.wrapS = cloudTex.wrapT = THREE.RepeatWrapping;
@@ -926,18 +745,12 @@ function buildSky() {
   cloudPlane.position.y = 220;
   scene.add(cloudPlane);
 
-  // no fog (keeps colors punchy)
   scene.fog = null;
   scene.background = new THREE.Color(0x2DBBFF);
 }
 
-
-// ===================== DECOR (birds + flowers) =====================
-let birds = [];
+// ===================== DECOR (flowers) =====================
 let flowers = [];
-let birdMat = null;
-
-function spawnBirds() { /* birds disabled */ }
 
 function spawnFlowers() {
   const colors = [0xff4fd8, 0xffff55, 0x55ff77, 0x55aaff, 0xff9955];
@@ -956,16 +769,224 @@ function spawnFlowers() {
 }
 
 function updateDecor(delta, now) {
-  // birds disabled
-
-  // tiny flower sway
   for (const f of flowers) {
     f.rotation.y += Math.sin(now*0.7 + f.position.x*0.03) * delta * 0.05;
   }
 }
 
+// ===================== SKY TEXT FIX (100 chars, 4 lines) =====================
+let skyBannerMesh = null;
 
+function wrapLinesByWords(text, ctx, maxWidth, maxLines = 4, maxCharsPerLine = 100) {
+  const words = String(text || "").trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return [""];
 
+  const lines = [];
+  let line = "";
+
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    const test = line ? (line + " " + w) : w;
+
+    const fitsWidth = ctx.measureText(test).width <= maxWidth;
+    const fitsChars = test.length <= maxCharsPerLine;
+
+    if (fitsWidth && fitsChars) {
+      line = test;
+      continue;
+    }
+
+    if (line) lines.push(line);
+    if (lines.length >= maxLines) return lines;
+
+    line = w;
+
+    if (line.length > maxCharsPerLine) {
+      lines.push(line);
+      if (lines.length >= maxLines) return lines;
+      line = "";
+    }
+  }
+
+  if (line && lines.length < maxLines) lines.push(line);
+  return lines.slice(0, maxLines);
+}
+
+function createSkyText() {
+  if (skyBannerMesh) {
+    scene.remove(skyBannerMesh);
+    skyBannerMesh.geometry.dispose();
+    if (skyBannerMesh.material.map) skyBannerMesh.material.map.dispose();
+    skyBannerMesh.material.dispose();
+    skyBannerMesh = null;
+  }
+
+  const text = sanitizeSkyText(SKY_TEXT_MSG);
+
+  const c = document.createElement("canvas");
+  c.width = 4096;
+  c.height = 900;
+  const ctx = c.getContext("2d");
+
+  // ✅ НИКАКОГО ФОНА (прозрачный)
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.imageSmoothingEnabled = false;
+
+  const padX = 220;
+  const maxWidth = c.width - padX * 2;
+
+  // ✅ твои лимиты
+  const MAX_LINES = 4;
+  const MAX_CHARS = 200; // <-- было 100, стало 200
+
+  let fontSize = 220;
+  let lines = [];
+
+  // используем твою wrapLinesByWords, но с новыми лимитами
+  for (let tries = 0; tries < 40; tries++) {
+    ctx.font = `${fontSize}px VT323, monospace`;
+    lines = wrapLinesByWords(text, ctx, maxWidth, MAX_LINES, MAX_CHARS);
+
+    const ok =
+      lines.length <= MAX_LINES &&
+      lines.every(l => ctx.measureText(l).width <= maxWidth && l.length <= MAX_CHARS);
+
+    if (ok) break;
+
+    fontSize -= 6;
+    if (fontSize < 90) break;
+  }
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.lineJoin = "miter";
+
+  const cx = c.width / 2;
+  const lineGap = Math.floor(fontSize * 0.95);
+  const blockH = lineGap * (lines.length - 1);
+  const startY = (c.height / 2) - (blockH / 2);
+
+  // ✅ “майнкрафт-блок”: темная "грань" + черный контур + белое лицо
+  const depth = Math.max(10, Math.floor(fontSize * 0.09));
+
+  // грань (объём)
+  ctx.fillStyle = "#2b2b2b";
+  for (let i = 1; i <= depth; i += 2) {
+    for (let li = 0; li < lines.length; li++) {
+      const y = startY + li * lineGap;
+      ctx.fillText(lines[li], cx + i, y + i);
+    }
+  }
+
+  // контур
+  ctx.lineWidth = Math.max(14, Math.floor(fontSize * 0.14));
+  ctx.strokeStyle = "#000000";
+  for (let li = 0; li < lines.length; li++) {
+    const y = startY + li * lineGap;
+    ctx.strokeText(lines[li], cx, y);
+  }
+
+  // лицо (белое)
+  ctx.fillStyle = "#FFFFFF";
+  for (let li = 0; li < lines.length; li++) {
+    const y = startY + li * lineGap;
+    ctx.fillText(lines[li], cx, y);
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+
+  // ✅ пиксельный вид
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.NearestFilter;
+  tex.needsUpdate = true;
+
+  const mat = new THREE.MeshBasicMaterial({
+    map: tex,
+    transparent: true,
+    depthWrite: false
+  });
+
+  // ✅ ширина баннера 300 (как просила)
+  const geo = new THREE.PlaneGeometry(300, 60);
+
+  skyBannerMesh = new THREE.Mesh(geo, mat);
+  skyBannerMesh.position.set(0, 185, -240);
+  skyBannerMesh.lookAt(0, 135, 0);
+  scene.add(skyBannerMesh);
+}// ===================== GAME INIT =====================
+function init() {
+  scene = new THREE.Scene(); scene.background = new THREE.Color(0x2DBBFF); scene.fog = null;
+  camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000); camera.rotation.order = 'YXZ';
+  weaponGroup = new THREE.Group(); scene.add(weaponGroup);
+
+  renderer = new THREE.WebGLRenderer({ antialias: false }); renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.body.appendChild(renderer.domElement);
+
+  renderer.setClearColor(0x2DBBFF, 1);
+
+  buildSky();
+
+  const ambient = new THREE.AmbientLight(0xffffff, 0.5); scene.add(ambient);
+  const sun = new THREE.DirectionalLight(0xffffff, 0.8); sun.position.set(50, 100, 50); sun.castShadow = true;
+  sun.shadow.mapSize.width = 2048; sun.shadow.mapSize.height = 2048; scene.add(sun);
+
+  applyLanguageToUI();
+  createWorld();
+  setWeapon('gun');
+  spawnLoot();
+  spawnFlowers();
+  spawnBalloons();
+  totalCards = compliments.length;
+  document.getElementById('cards-total').innerText = totalCards;
+  updateProgressUI();
+  createSkyText();
+
+  const closeBtn = document.getElementById('close-card-btn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const card = document.getElementById('bday-card');
+      if (card) card.style.display = 'none';
+      isModalOpen = false;
+
+      if (pendingVictory) {
+        pendingVictory = false;
+        setTimeout(() => checkWin(), 0);
+        return;
+      }
+
+      if (!isDead) document.body.requestPointerLock();
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if(isDead) return;
+    if(e.key === '1') setWeapon('gun');
+    if(e.key === '2' && inventory.includes('sword')) setWeapon('sword');
+    if(e.key === '3' && inventory.includes('axe')) setWeapon('axe');
+    if(e.code === 'Space') { move.jump = true; }
+    if(e.code === 'ShiftLeft') { move.sprint = true; }
+    handleKeys(e.code, true);
+  });
+  document.addEventListener('keyup', e => {
+    if(e.code === 'Space') move.jump = false;
+    if(e.code === 'ShiftLeft') move.sprint = false;
+    handleKeys(e.code, false);
+  });
+  document.addEventListener('mousedown', attack);
+  document.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('resize', () => {
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+  animate();
+}
+
+// ===================== WORLD / ENTITIES =====================
 function createWorld() {
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshLambertMaterial({map: textures.grass}));
   floor.rotation.x = -Math.PI/2; floor.receiveShadow = true;
@@ -984,10 +1005,7 @@ function createWorld() {
     const type = Math.random()>0.5?'zombie':'skeleton';
     const m = createMob(type, type);
     m.position.set(Math.random()*60-30, 0, Math.random()*60-30);
-
-    // ✅ запоминаем "дом" моба (точка спавна)
     m.userData.home = m.position.clone();
-
     scene.add(m); targets.push({obj: m});
   }
 }
@@ -1016,14 +1034,12 @@ function createTree(x, z) {
   group.add(trunk); group.position.set(x, 0, z); scene.add(group);
 }
 
-/* ✅ ВАЖНО: твой старый спавн шаров был в глобальном коде.
-   Перенесён в функцию, чтобы:
-   - шары создавались после загрузки параметров
-   - шары создавались когда уже есть scene
-*/
 function spawnBalloons() {
   const balloonCount = Math.max(1, compliments.length);
-  for (let i = 0; i < balloonCount; i++) {
+  
+  totalBalloons = balloonCount;
+  poppedBalloons = 0;
+for (let i = 0; i < balloonCount; i++) {
     const grp = new THREE.Group();
     const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16), new THREE.MeshLambertMaterial({color: 0xff0000}));
     const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshLambertMaterial({color: 0xffff00}));
@@ -1051,7 +1067,6 @@ function spawnCard(pos) {
   cards.push(card);
 }
 
-/* дальше код без изменений (как у тебя) */
 function setWeapon(type) {
   currentWeaponType = type; weaponGroup.clear();
   document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
@@ -1077,19 +1092,38 @@ function setWeapon(type) {
   }
 }
 
-
 function spawnLoot() {
   const chestGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8); const chestMat = new THREE.MeshLambertMaterial({map: textures.chest});
-  for(let i=0; i<8; i++) { const b = new THREE.Mesh(chestGeo, chestMat); b.position.set(Math.random()*80-40, 0.4, Math.random()*80-40); b.userData = { type: 'chest' }; scene.add(b); bonuses.push(b); }
+  function validChestSpot(x, z) {
+  const pad = 1.4; // запас, чтобы сундук не оказался внутри/вплотную к домам
+  for (let h of houses) {
+    if (!h || h.hp <= 0) continue;
+    if (x > h.bounds.minX - pad && x < h.bounds.maxX + pad &&
+        z > h.bounds.minZ - pad && z < h.bounds.maxZ + pad) return false;
+  }
+  return true;
+}
+for(let i=0; i<8; i++) {
+  let x = 0, z = 0, tries = 0;
+  do {
+    x = Math.random()*80-40;
+    z = Math.random()*80-40;
+    tries++;
+  } while(!validChestSpot(x, z) && tries < 250);
 
-  // sword item
+  const b = new THREE.Mesh(chestGeo, chestMat);
+  b.position.set(x, 0.4, z);
+  b.userData = { type: 'chest' };
+  scene.add(b);
+  bonuses.push(b);
+}
+
   const sword = new THREE.Group();
-  const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.05), new THREE.MeshLambertMaterial({color: 0x88ccff})); 
+  const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.05), new THREE.MeshLambertMaterial({color: 0x88ccff}));
   const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033}));
   blade.position.y=0.4; handle.position.y=-0.15; sword.add(blade, handle);
   sword.position.set(5, 0.5, 5); sword.rotation.z = Math.PI/2; sword.userData = { type: 'sword_item' }; scene.add(sword); items.push(sword);
 
-  // axe item (new)
   const axe = new THREE.Group();
   const stick = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.9, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033}));
   stick.position.y = 0.1;
@@ -1101,7 +1135,6 @@ function spawnLoot() {
   totalChests = bonuses.length;
   document.getElementById('chests-total').innerText = totalChests;
 }
-
 
 function createMob(text, type) {
   const mob = new THREE.Group();
@@ -1126,7 +1159,7 @@ function createMob(text, type) {
   mob.add(body, head, armL, armR, legL, legR, hat);
   mob.userData = { parts: {armL, armR, legL, legR, body, head}, isAggro: false, aggroTimer: 0, type: type || 'zombie', shotTimer: 0,
     walkTimer: Math.random() * 2, walkDir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(),
-    home: null // ✅ заполним после установки позиции
+    home: null
   };
   return mob;
 }
@@ -1171,7 +1204,6 @@ function attack() {
     let hit = hits[0].object; let root = hit; while(root.parent && root.parent.type !== 'Scene') root = root.parent;
 
     if(balloons.includes(root)) {
-      // balloons can be popped ONLY with the gun
       if(currentWeaponType !== 'gun') { return; }
 
       playSound('pop'); playSound('music');
@@ -1179,8 +1211,9 @@ function attack() {
       scene.remove(root);
       balloons = balloons.filter(b => b!==root);
 
-      // найдено послание (засчитываем прогресс и очки тут)
-      foundCards++;
+      
+      poppedBalloons++;
+foundCards++;
       score += 100;
       updateUI();
       updateProgressUI();
@@ -1196,14 +1229,12 @@ function attack() {
       isModalOpen = true;
       document.exitPointerLock();
 
-      // "прочитано" засчитываем при первом открытии карточки
       if (!hit.userData._read) {
         hit.userData._read = true;
         readCards++;
       }
 
-      // если это последняя непрочитанная — финал покажем ПОСЛЕ закрытия карточки
-      if (totalCards > 0 && readCards >= totalCards) {
+      if (totalCards > 0 && readCards >= totalCards && totalBalloons > 0 && poppedBalloons >= totalBalloons) {
         pendingVictory = true;
       }
 
@@ -1230,12 +1261,8 @@ function attack() {
 
     const target = targets.find(t => t.obj === mobGroup);
     if(target) {
-      // shot hit mob
       if (currentWeaponType === 'gun') pacifistFailed = true;
-
-      // funny bounce
       target.obj.userData.yVel = 7.5;
-
       target.obj.userData.isAggro = true;
       target.obj.userData.aggroTimer = 10;
       spawnParticles(target.obj.position, 0xff0000, true);
@@ -1244,7 +1271,8 @@ function attack() {
 }
 
 function updateUI() {
-  document.getElementById('lvl-num').innerText = score;document.getElementById('xp-fill').style.width = Math.min(100, (score % 1000) / 10) + '%';
+  document.getElementById('lvl-num').innerText = score;
+  document.getElementById('xp-fill').style.width = Math.min(100, (score % 1000) / 10) + '%';
 }
 
 function checkHouseProtection(pos) {
@@ -1308,7 +1336,6 @@ function updatePhysics(delta) {
     if (camera.position.x > h.bounds.minX && camera.position.x < h.bounds.maxX && nextZ > h.bounds.maxZ - wallT && nextZ < h.bounds.maxZ + wallT) canMoveZ = false;
   }
 
-  // ✅ ОГРАНИЧЕНИЕ КАРТЫ: нельзя выйти за пределы поля
   nextX = Math.max(WORLD_MIN, Math.min(WORLD_MAX, nextX));
   nextZ = Math.max(WORLD_MIN, Math.min(WORLD_MAX, nextZ));
 
@@ -1348,15 +1375,11 @@ function animate() {
     }
   } else weaponGroup.rotateX(currentWeaponType !== 'gun' ? Math.PI/8 : 0);
 
-  // ===== MOB AI + LIMITS =====
   targets.forEach(t => {
     const mob = t.obj;
     const distToPlayer = mob.position.distanceTo(camera.position);
-
-    // дом
     const home = mob.userData.home || mob.position.clone();
 
-    // если моб улетел далеко — мягко возвращаем (или телепортим чуть ближе к дому)
     if (distToPlayer > MOB_PLAYER_MAX_DIST) {
       const dirHome = home.clone().sub(mob.position);
       if (dirHome.length() > 0.001) {
@@ -1381,15 +1404,11 @@ function animate() {
         }
       }
     } else {
-      // гуляем вокруг дома, не уходим далеко
       mob.userData.walkTimer -= delta;
       if(mob.userData.walkTimer <= 0) {
         mob.userData.walkTimer = Math.random() * 3 + 1;
-
-        // направление: либо случайное, либо назад к дому, если вышли за радиус
         const toHome = home.clone().sub(mob.position);
         const dHome = toHome.length();
-
         if (dHome > MOB_HOME_RADIUS) {
           mob.userData.walkDir = toHome.normalize();
         } else {
@@ -1400,11 +1419,9 @@ function animate() {
       mob.translateZ(1.5 * delta);
     }
 
-    // ✅ КЛЭМП моба по карте (чтобы не уходил за край)
     mob.position.x = Math.max(WORLD_MIN + MOB_WORLD_CLAMP_MARGIN, Math.min(WORLD_MAX - MOB_WORLD_CLAMP_MARGIN, mob.position.x));
     mob.position.z = Math.max(WORLD_MIN + MOB_WORLD_CLAMP_MARGIN, Math.min(WORLD_MAX - MOB_WORLD_CLAMP_MARGIN, mob.position.z));
 
-    // bounce physics
     if (typeof mob.userData.yVel === 'number') {
       mob.userData.yVel -= 25 * delta;
       mob.position.y += mob.userData.yVel * delta;
@@ -1416,8 +1433,6 @@ function animate() {
     p.legL.rotation.x = -w; p.legR.rotation.x = w;
   });
 
-
-  // ===== HUG CHECK (achievement) =====
   for (let i=0; i<targets.length; i++) {
     for (let j=i+1; j<targets.length; j++) {
       const a = targets[i].obj, b = targets[j].obj;
@@ -1451,7 +1466,6 @@ function animate() {
 
   updateDecor(delta, now);
 
-  // cloud plane follows camera and scrolls texture
   if (cloudPlane && cloudPlane.material && cloudPlane.material.map) {
     cloudPlane.position.x = camera.position.x;
     cloudPlane.position.z = camera.position.z;
@@ -1473,7 +1487,6 @@ document.body.addEventListener('click', () => {
   if(!isDead && !isModalOpen) document.body.requestPointerLock();
 });
 
-// IMPORTANT: load params first, then start game
 (async () => {
   await loadLevelData();
   init();
